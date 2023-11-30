@@ -79,12 +79,22 @@ namespace Services
                 var product = await _unitOfWork.Products.GetById(productDetails.ProductId);
                 if (product is not null)
                 {
-                    //product.TenSanPham = productDetails.TenSanPham;
-                    //product.MaSanPham = productDetails.MaSanPham;
-                    //product.HinhSanPham = productDetails.HinhSanPham;
-                    //product.GiaSanPham = productDetails.GiaSanPham;
+                    product.ProductName = productDetails.ProductName;
+                    product.Cpu = productDetails.Cpu;
+                    product.Gpu = productDetails.Gpu;
+                    product.HardDisks = productDetails.HardDisks;
+                    product.Camera = productDetails.Camera;
+                    product.Selfie = productDetails.Selfie;
+                    product.Screen = productDetails.Screen;
+                    product.Ram = productDetails.Ram;
+                    product.Description = productDetails.Description;
+                    product.ImageUrl = productDetails.ImageUrl;
+                    product.Price = productDetails.Price;
+                    product.OtherProductDetails = productDetails.OtherProductDetails;
+                    product.ProductTypeId = productDetails.ProductTypeId;
+                    product.PromotionId = productDetails.PromotionId;
+                    product.Weight = productDetails.Weight;
 
-                    // db chưa đúng
 
                     _unitOfWork.Products.Update(product);
                     var result = _unitOfWork.Save();
