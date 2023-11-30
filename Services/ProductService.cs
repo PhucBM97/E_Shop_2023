@@ -79,21 +79,21 @@ namespace Services
                 var product = await _unitOfWork.Products.GetById(productDetails.ProductId);
                 if (product is not null)
                 {
-                    product.ProductName = productDetails.ProductName;
-                    product.Cpu = productDetails.Cpu;
-                    product.Gpu = productDetails.Gpu;
-                    product.HardDisks = productDetails.HardDisks;
-                    product.Camera = productDetails.Camera;
-                    product.Selfie = productDetails.Selfie;
-                    product.Screen = productDetails.Screen;
-                    product.Ram = productDetails.Ram;
-                    product.Description = productDetails.Description;
-                    product.ImageUrl = productDetails.ImageUrl;
-                    product.Price = productDetails.Price;
-                    product.OtherProductDetails = productDetails.OtherProductDetails;
-                    product.ProductTypeId = productDetails.ProductTypeId;
-                    product.PromotionId = productDetails.PromotionId;
-                    product.Weight = productDetails.Weight;
+                    //product.ProductName = productDetails.ProductName;
+                    //product.Cpu = productDetails.Cpu;
+                    //product.Gpu = productDetails.Gpu;
+                    //product.HardDisks = productDetails.HardDisks;
+                    //product.Camera = productDetails.Camera;
+                    //product.Selfie = productDetails.Selfie;
+                    //product.Screen = productDetails.Screen;
+                    //product.Ram = productDetails.Ram;
+                    //product.Description = productDetails.Description;
+                    //product.ImageUrl = productDetails.ImageUrl;
+                    //product.Price = productDetails.Price;
+                    //product.OtherProductDetails = productDetails.OtherProductDetails;
+                    //product.ProductTypeId = productDetails.ProductTypeId;
+                    //product.PromotionId = productDetails.PromotionId;
+                    //product.Weight = productDetails.Weight;
 
 
                     _unitOfWork.Products.Update(product);

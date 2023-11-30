@@ -5,6 +5,11 @@ namespace Core.Models
 {
     public partial class Customer
     {
+        public Customer()
+        {
+            Orders = new HashSet<Order>();
+        }
+
         public int CustomerId { get; set; }
         public string? FullName { get; set; }
         public string? Email { get; set; }
@@ -14,5 +19,10 @@ namespace Core.Models
         public string? Phone { get; set; }
         public string? Address { get; set; }
         public bool? IsActive { get; set; }
+        public DateTime? CreatedDate { get; set; }
+        public DateTime? UpdatedDate { get; set; }
+
+        public virtual Cart? Cart { get; set; }
+        public virtual ICollection<Order> Orders { get; set; }
     }
 }

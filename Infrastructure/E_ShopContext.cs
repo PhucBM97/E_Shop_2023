@@ -16,14 +16,22 @@ namespace Core.Models
         {
         }
 
+        public virtual DbSet<Brand> Brands { get; set; } = null!;
+        public virtual DbSet<Cart> Carts { get; set; } = null!;
+        public virtual DbSet<CartItem> CartItems { get; set; } = null!;
+        public virtual DbSet<Category> Categories { get; set; } = null!;
+        public virtual DbSet<Color> Colors { get; set; } = null!;
+        public virtual DbSet<ColorsSpecific> ColorsSpecifics { get; set; } = null!;
         public virtual DbSet<Customer> Customers { get; set; } = null!;
+        public virtual DbSet<Image> Images { get; set; } = null!;
+        public virtual DbSet<Inventory> Inventories { get; set; } = null!;
         public virtual DbSet<Order> Orders { get; set; } = null!;
         public virtual DbSet<OrderDetail> OrderDetails { get; set; } = null!;
-        public virtual DbSet<OrderDetailsStatus> OrderDetailsStatuses { get; set; } = null!;
         public virtual DbSet<Payment> Payments { get; set; } = null!;
         public virtual DbSet<Product> Products { get; set; } = null!;
-        public virtual DbSet<ProductType> ProductTypes { get; set; } = null!;
         public virtual DbSet<Promotion> Promotions { get; set; } = null!;
+        public virtual DbSet<Size> Sizes { get; set; } = null!;
+        public virtual DbSet<SizesSpecific> SizesSpecifics { get; set; } = null!;
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -35,15 +43,145 @@ namespace Core.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<Brand>(entity =>
+            {
+                entity.Property(e => e.BrandId).HasColumnName("BrandID");
+
+                entity.Property(e => e.BrandName).HasMaxLength(100);
+
+                entity.Property(e => e.CreatedDate)
+                    .HasColumnType("datetime")
+                    .HasColumnName("Created_Date");
+
+                entity.Property(e => e.UpdatedDate)
+                    .HasColumnType("datetime")
+                    .HasColumnName("Updated_Date");
+            });
+
+            modelBuilder.Entity<Cart>(entity =>
+            {
+                entity.HasIndex(e => e.CustomerId, "IX_Carts")
+                    .IsUnique();
+
+                entity.Property(e => e.CartId).HasColumnName("CartID");
+
+                entity.Property(e => e.CreatedDate)
+                    .HasColumnType("datetime")
+                    .HasColumnName("Created_Date");
+
+                entity.Property(e => e.CustomerId).HasColumnName("CustomerID");
+
+                entity.Property(e => e.Status)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UpdatedDate)
+                    .HasColumnType("datetime")
+                    .HasColumnName("Updated_Date");
+
+                entity.HasOne(d => d.Customer)
+                    .WithOne(p => p.Cart)
+                    .HasForeignKey<Cart>(d => d.CustomerId)
+                    .HasConstraintName("FK_Carts_Customer");
+            });
+
+            modelBuilder.Entity<CartItem>(entity =>
+            {
+                entity.ToTable("Cart_Item");
+
+                entity.Property(e => e.CartItemId)
+                    .ValueGeneratedNever()
+                    .HasColumnName("CartItemID");
+
+                entity.Property(e => e.CartId).HasColumnName("CartID");
+
+                entity.Property(e => e.ProductId)
+                    .ValueGeneratedOnAdd()
+                    .HasColumnName("ProductID");
+
+                entity.Property(e => e.Total).HasColumnType("decimal(18, 2)");
+
+                entity.HasOne(d => d.Cart)
+                    .WithMany(p => p.CartItems)
+                    .HasForeignKey(d => d.CartId)
+                    .HasConstraintName("FK_Cart_Item_Carts");
+
+                entity.HasOne(d => d.Product)
+                    .WithMany(p => p.CartItems)
+                    .HasForeignKey(d => d.ProductId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Cart_Item_Products");
+            });
+
+            modelBuilder.Entity<Category>(entity =>
+            {
+                entity.Property(e => e.CategoryId).HasColumnName("CategoryID");
+
+                entity.Property(e => e.CreatedDate)
+                    .HasColumnType("datetime")
+                    .HasColumnName("Created_Date");
+
+                entity.Property(e => e.Name).HasMaxLength(500);
+
+                entity.Property(e => e.ParentCategoryId).HasColumnName("ParentCategoryID");
+
+                entity.Property(e => e.UpdatedDate)
+                    .HasColumnType("datetime")
+                    .HasColumnName("Updated_Date");
+
+                entity.HasOne(d => d.ParentCategory)
+                    .WithMany(p => p.InverseParentCategory)
+                    .HasForeignKey(d => d.ParentCategoryId)
+                    .HasConstraintName("FK_Categories_Categories");
+            });
+
+            modelBuilder.Entity<Color>(entity =>
+            {
+                entity.Property(e => e.ColorId).HasColumnName("ColorID");
+
+                entity.Property(e => e.ColorName).HasMaxLength(100);
+
+                entity.Property(e => e.CreatedDate)
+                    .HasColumnType("datetime")
+                    .HasColumnName("Created_Date");
+
+                entity.Property(e => e.UpdatedDate)
+                    .HasColumnType("datetime")
+                    .HasColumnName("Updated_Date");
+            });
+
+            modelBuilder.Entity<ColorsSpecific>(entity =>
+            {
+                entity.ToTable("Colors_Specific");
+
+                entity.Property(e => e.Id).HasColumnName("ID");
+
+                entity.Property(e => e.ColorId).HasColumnName("ColorID");
+
+                entity.Property(e => e.ProductId).HasColumnName("ProductID");
+
+                entity.HasOne(d => d.Color)
+                    .WithMany(p => p.ColorsSpecifics)
+                    .HasForeignKey(d => d.ColorId)
+                    .HasConstraintName("FK_Colors_Specific_Colors");
+
+                entity.HasOne(d => d.Product)
+                    .WithMany(p => p.ColorsSpecifics)
+                    .HasForeignKey(d => d.ProductId)
+                    .HasConstraintName("FK_Colors_Specific_Products");
+            });
+
             modelBuilder.Entity<Customer>(entity =>
             {
-                entity.ToTable("Customer");
-
                 entity.Property(e => e.CustomerId).HasColumnName("CustomerID");
 
                 entity.Property(e => e.Address)
                     .HasMaxLength(10)
                     .IsFixedLength();
+
+                entity.Property(e => e.CreatedDate)
+                    .HasColumnType("datetime")
+                    .HasColumnName("Created_Date");
 
                 entity.Property(e => e.Dob)
                     .HasColumnType("date")
@@ -60,11 +198,46 @@ namespace Core.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.Phone).HasMaxLength(20);
+
+                entity.Property(e => e.UpdatedDate)
+                    .HasColumnType("datetime")
+                    .HasColumnName("Updated_Date");
+            });
+
+            modelBuilder.Entity<Image>(entity =>
+            {
+                entity.Property(e => e.ImageId).HasColumnName("ImageID");
+
+                entity.Property(e => e.Path).IsUnicode(false);
+
+                entity.Property(e => e.ProductId).HasColumnName("ProductID");
+
+                entity.HasOne(d => d.Product)
+                    .WithMany(p => p.Images)
+                    .HasForeignKey(d => d.ProductId)
+                    .HasConstraintName("FK_Images_Products");
+            });
+
+            modelBuilder.Entity<Inventory>(entity =>
+            {
+                entity.Property(e => e.InventoryId).HasColumnName("InventoryID");
+
+                entity.Property(e => e.CreatedDate)
+                    .HasColumnType("datetime")
+                    .HasColumnName("Created_Date");
+
+                entity.Property(e => e.UpdatedDate)
+                    .HasColumnType("datetime")
+                    .HasColumnName("Updated_Date");
             });
 
             modelBuilder.Entity<Order>(entity =>
             {
                 entity.Property(e => e.OrderId).HasColumnName("OrderID");
+
+                entity.Property(e => e.CreatedDate)
+                    .HasColumnType("datetime")
+                    .HasColumnName("Created_Date");
 
                 entity.Property(e => e.CustomerId).HasColumnName("CustomerID");
 
@@ -74,7 +247,23 @@ namespace Core.Models
 
                 entity.Property(e => e.OrderStatusCode).HasColumnName("Order_Status_Code");
 
+                entity.Property(e => e.PaymentId).HasColumnName("PaymentID");
+
                 entity.Property(e => e.Total).HasColumnType("decimal(18, 2)");
+
+                entity.Property(e => e.UpdatedDate)
+                    .HasColumnType("datetime")
+                    .HasColumnName("Updated_Date");
+
+                entity.HasOne(d => d.Customer)
+                    .WithMany(p => p.Orders)
+                    .HasForeignKey(d => d.CustomerId)
+                    .HasConstraintName("FK_Orders_Customer");
+
+                entity.HasOne(d => d.Payment)
+                    .WithMany(p => p.Orders)
+                    .HasForeignKey(d => d.PaymentId)
+                    .HasConstraintName("FK_Orders_Payments");
             });
 
             modelBuilder.Entity<OrderDetail>(entity =>
@@ -90,50 +279,53 @@ namespace Core.Models
                 entity.Property(e => e.ProductId).HasColumnName("ProductID");
 
                 entity.Property(e => e.SubTotal).HasColumnType("decimal(18, 2)");
-            });
 
-            modelBuilder.Entity<OrderDetailsStatus>(entity =>
-            {
-                entity.HasKey(e => e.OrderItemStatusCode)
-                    .HasName("PK_OrderItem_Status");
+                entity.HasOne(d => d.Order)
+                    .WithMany(p => p.OrderDetails)
+                    .HasForeignKey(d => d.OrderId)
+                    .HasConstraintName("FK_OrderDetails_Orders");
 
-                entity.ToTable("OrderDetails_Status");
-
-                entity.Property(e => e.OrderItemStatusCode).HasColumnName("OrderItem_Status_Code");
+                entity.HasOne(d => d.Product)
+                    .WithMany(p => p.OrderDetails)
+                    .HasForeignKey(d => d.ProductId)
+                    .HasConstraintName("FK_OrderDetails_Products");
             });
 
             modelBuilder.Entity<Payment>(entity =>
             {
                 entity.Property(e => e.PaymentId).HasColumnName("PaymentID");
 
+                entity.Property(e => e.CreatedDate)
+                    .HasColumnType("datetime")
+                    .HasColumnName("Created_Date");
+
                 entity.Property(e => e.PaymentName).HasMaxLength(100);
+
+                entity.Property(e => e.UpdateDate)
+                    .HasColumnType("datetime")
+                    .HasColumnName("Update_Date");
             });
 
             modelBuilder.Entity<Product>(entity =>
             {
+                entity.HasIndex(e => e.InventoryId, "IX_Products")
+                    .IsUnique();
+
                 entity.Property(e => e.ProductId).HasColumnName("ProductID");
 
-                entity.Property(e => e.Camera)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
+                entity.Property(e => e.BrandId).HasColumnName("BrandID");
 
-                entity.Property(e => e.Cpu)
-                    .HasMaxLength(100)
-                    .HasColumnName("CPU");
+                entity.Property(e => e.CategoryId).HasColumnName("CategoryID");
 
-                entity.Property(e => e.CreateDate).HasColumnType("datetime");
-
-                entity.Property(e => e.Gpu)
-                    .HasMaxLength(100)
-                    .HasColumnName("GPU");
-
-                entity.Property(e => e.HardDisks)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
+                entity.Property(e => e.CreatedDate)
+                    .HasColumnType("datetime")
+                    .HasColumnName("Created_Date");
 
                 entity.Property(e => e.ImageUrl)
                     .IsUnicode(false)
                     .HasColumnName("Image_Url");
+
+                entity.Property(e => e.InventoryId).HasColumnName("InventoryID");
 
                 entity.Property(e => e.OtherProductDetails).HasMaxLength(200);
 
@@ -141,44 +333,40 @@ namespace Core.Models
 
                 entity.Property(e => e.ProductName).HasMaxLength(500);
 
-                entity.Property(e => e.ProductTypeId).HasColumnName("ProductTypeID");
-
                 entity.Property(e => e.PromotionId).HasColumnName("PromotionID");
 
-                entity.Property(e => e.Ram)
-                    .HasMaxLength(50)
-                    .IsUnicode(false)
-                    .HasColumnName("RAM");
+                entity.Property(e => e.UpdatedDate)
+                    .HasColumnType("datetime")
+                    .HasColumnName("Updated_Date");
 
-                entity.Property(e => e.Screen).HasMaxLength(100);
+                entity.HasOne(d => d.Brand)
+                    .WithMany(p => p.Products)
+                    .HasForeignKey(d => d.BrandId)
+                    .HasConstraintName("FK_Products_Brands");
 
-                entity.Property(e => e.Selfie)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
+                entity.HasOne(d => d.Category)
+                    .WithMany(p => p.Products)
+                    .HasForeignKey(d => d.CategoryId)
+                    .HasConstraintName("FK_Products_Categories");
 
-                entity.Property(e => e.Storage)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
+                entity.HasOne(d => d.Inventory)
+                    .WithOne(p => p.Product)
+                    .HasForeignKey<Product>(d => d.InventoryId)
+                    .HasConstraintName("FK_Products_Inventories");
 
-                entity.Property(e => e.UpdateDate).HasColumnType("datetime");
-
-                entity.Property(e => e.Weight)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
-            });
-
-            modelBuilder.Entity<ProductType>(entity =>
-            {
-                entity.Property(e => e.ProductTypeId).HasColumnName("ProductTypeID");
-
-                entity.Property(e => e.ParentCategoryId).HasColumnName("ParentCategoryID");
-
-                entity.Property(e => e.ProductTypeName).HasMaxLength(500);
+                entity.HasOne(d => d.Promotion)
+                    .WithMany(p => p.Products)
+                    .HasForeignKey(d => d.PromotionId)
+                    .HasConstraintName("FK_Products_Promotions");
             });
 
             modelBuilder.Entity<Promotion>(entity =>
             {
                 entity.Property(e => e.PromotionId).HasColumnName("PromotionID");
+
+                entity.Property(e => e.CreatedDate)
+                    .HasColumnType("datetime")
+                    .HasColumnName("Created_Date");
 
                 entity.Property(e => e.Discount).HasColumnType("decimal(5, 1)");
 
@@ -192,7 +380,51 @@ namespace Core.Models
                     .HasColumnType("datetime")
                     .HasColumnName("Start_Date");
 
+                entity.Property(e => e.UpdatedDate)
+                    .HasColumnType("datetime")
+                    .HasColumnName("Updated_Date");
+
                 entity.Property(e => e.Voucher).HasMaxLength(200);
+            });
+
+            modelBuilder.Entity<Size>(entity =>
+            {
+                entity.Property(e => e.SizeId).HasColumnName("SizeID");
+
+                entity.Property(e => e.CreatedDate)
+                    .HasColumnType("datetime")
+                    .HasColumnName("Created_Date");
+
+                entity.Property(e => e.Details).HasColumnType("text");
+
+                entity.Property(e => e.Number)
+                    .HasMaxLength(45)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UpdatedDate)
+                    .HasColumnType("datetime")
+                    .HasColumnName("Updated_Date");
+            });
+
+            modelBuilder.Entity<SizesSpecific>(entity =>
+            {
+                entity.ToTable("Sizes_Specific");
+
+                entity.Property(e => e.Id).HasColumnName("ID");
+
+                entity.Property(e => e.ProductId).HasColumnName("ProductID");
+
+                entity.Property(e => e.SizeId).HasColumnName("SizeID");
+
+                entity.HasOne(d => d.Product)
+                    .WithMany(p => p.SizesSpecifics)
+                    .HasForeignKey(d => d.ProductId)
+                    .HasConstraintName("FK_Sizes_Specific_Products");
+
+                entity.HasOne(d => d.Size)
+                    .WithMany(p => p.SizesSpecifics)
+                    .HasForeignKey(d => d.SizeId)
+                    .HasConstraintName("FK_Sizes_Specific_Sizes");
             });
 
             OnModelCreatingPartial(modelBuilder);

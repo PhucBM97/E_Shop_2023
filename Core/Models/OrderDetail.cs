@@ -13,5 +13,8 @@ namespace Core.Models
         public decimal? Price { get; set; }
         public decimal? SubTotal { get; set; }
         public string? OtherOrderItemDetails { get; set; }
+
+        public virtual Order? Order { get; set; }
+        public virtual Product? Product { get; set; }
     }
 }
