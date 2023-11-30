@@ -6,10 +6,10 @@ namespace E_Shop_2023.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class SanPhamController : ControllerBase
+    public class ProductController : ControllerBase
     {
-        public readonly ISanPhamService _sanphamSrv;
-        public SanPhamController(ISanPhamService sanPhamService)
+        public readonly IProductService _sanphamSrv;
+        public ProductController(IProductService sanPhamService)
         {
             _sanphamSrv = sanPhamService;
         }

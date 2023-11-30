@@ -12,13 +12,13 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 
-builder.Services.AddDbContext<QLShopContext>(options =>
+builder.Services.AddDbContext<E_ShopContext>(options =>
     {
         options.UseSqlServer(builder.Configuration.GetConnectionString("cnnStr"));
     });
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-builder.Services.AddScoped<ISanPhamRepository, SanPhamRepository>();
-builder.Services.AddScoped<ISanPhamService, SanPhamService>();
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
+builder.Services.AddScoped<IProductService, ProductService>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

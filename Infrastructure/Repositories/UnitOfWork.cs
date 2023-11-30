@@ -10,10 +10,10 @@ namespace Infrastructure.Repositories
 {
     public class UnitOfWork : IUnitOfWork
     {
-        private readonly QLShopContext _dbContext;
-        public ISanPhamRepository SanPhams { get; }
+        private readonly E_ShopContext _dbContext;
+        public IProductRepository SanPhams { get; }
 
-        public UnitOfWork(QLShopContext dbContext, ISanPhamRepository sanphamRepo)
+        public UnitOfWork(E_ShopContext dbContext, IProductRepository sanphamRepo)
         {
             _dbContext = dbContext;
             SanPhams = sanphamRepo;

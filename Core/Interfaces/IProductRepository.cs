@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Core.Interfaces
 {
-    public interface ISanPhamRepository : IGenericRepository<Sanpham>
+    public interface IProductRepository : IGenericRepository<Product>
     {
     }
 }

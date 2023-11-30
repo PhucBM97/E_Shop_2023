@@ -11,9 +11,9 @@ namespace Infrastructure.Repositories
 {
     public abstract class GenericRepository<T> : IGenericRepository<T> where T : class
     {
-        protected readonly QLShopContext _dbContext;
+        protected readonly E_ShopContext _dbContext;
         protected readonly DbSet<T> _dbSet;
-        public GenericRepository(QLShopContext context)
+        public GenericRepository(E_ShopContext context)
         {
             _dbContext = context;
             _dbSet = context.Set<T>();

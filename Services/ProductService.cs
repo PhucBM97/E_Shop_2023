@@ -9,19 +9,19 @@ using System.Threading.Tasks;
 
 namespace Services
 {
-    public class SanPhamService : ISanPhamService
+    public class ProductService : IProductService
     {
         public IUnitOfWork _unitOfWork;
-        public SanPhamService(IUnitOfWork unitOfWork)
+        public ProductService(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<bool> CreateProduct(Sanpham productDetails)
+        public async Task<bool> CreateProduct(Product productDetails)
         {
             if (productDetails is not null)
             {
-                var product = _unitOfWork.SanPhams.GetById(productDetails.Id);
+                var product = _unitOfWork.SanPhams.GetById(productDetails.ProductId);
                 if( product is null)
                 {
                     await _unitOfWork.SanPhams.Add(productDetails);
@@ -53,13 +53,13 @@ namespace Services
             return false;
         }
 
-        public async Task<IEnumerable<Sanpham>> GetAllProducts()
+        public async Task<IEnumerable<Product>> GetAllProducts()
         {
             var products = await _unitOfWork.SanPhams.GetAll();
             return products;
         }
 
-        public async Task<Sanpham> GetProductById(int productId)
+        public async Task<Product> GetProductById(int productId)
         {
             if (productId > 0)
             {
@@ -72,17 +72,17 @@ namespace Services
             return null;
         }
 
-        public async Task<bool> UpdateProduct(Sanpham productDetails)
+        public async Task<bool> UpdateProduct(Product productDetails)
         {
             if (productDetails is not null)
             {
-                var product = await _unitOfWork.SanPhams.GetById(productDetails.Id);
+                var product = await _unitOfWork.SanPhams.GetById(productDetails.ProductId);
                 if (product is not null)
                 {
-                    product.TenSanPham = productDetails.TenSanPham;
-                    product.MaSanPham = productDetails.MaSanPham;
-                    product.HinhSanPham = productDetails.HinhSanPham;
-                    product.GiaSanPham = productDetails.GiaSanPham;
+                    //product.TenSanPham = productDetails.TenSanPham;
+                    //product.MaSanPham = productDetails.MaSanPham;
+                    //product.HinhSanPham = productDetails.HinhSanPham;
+                    //product.GiaSanPham = productDetails.GiaSanPham;
 
                     // db chưa đúng
 

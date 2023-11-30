@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace Infrastructure.Repositories
 {
-    public class SanPhamRepository : GenericRepository<Sanpham>, ISanPhamRepository
+    public class ProductRepository : GenericRepository<Product>, IProductRepository
     {
-        public SanPhamRepository(QLShopContext dbContext) : base(dbContext)
+        public ProductRepository(E_ShopContext dbContext) : base(dbContext)
         {
             
         }
