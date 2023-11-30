@@ -8,7 +8,7 @@ namespace Core.Interfaces
 {
     public interface IUnitOfWork : IDisposable
     {
-        IProductRepository SanPhams { get; }
+        IProductRepository Products { get; }
 
         int Save();
     }

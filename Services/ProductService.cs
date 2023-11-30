@@ -21,10 +21,10 @@ namespace Services
         {
             if (productDetails is not null)
             {
-                var product = _unitOfWork.SanPhams.GetById(productDetails.ProductId);
+                var product = _unitOfWork.Products.GetById(productDetails.ProductId);
                 if( product is null)
                 {
-                    await _unitOfWork.SanPhams.Add(productDetails);
+                    await _unitOfWork.Products.Add(productDetails);
 
                     var result = _unitOfWork.Save();
 
@@ -39,10 +39,10 @@ namespace Services
         {
             if (productId > 0)
             {
-                var product = await _unitOfWork.SanPhams.GetById(productId);
+                var product = await _unitOfWork.Products.GetById(productId);
                 if( product is not null)
                 {
-                    _unitOfWork.SanPhams.Delete(product);
+                    _unitOfWork.Products.Delete(product);
                     var result = _unitOfWork.Save();
                     if (result > 0)
                     {
@@ -55,7 +55,7 @@ namespace Services
 
         public async Task<IEnumerable<Product>> GetAllProducts()
         {
-            var products = await _unitOfWork.SanPhams.GetAll();
+            var products = await _unitOfWork.Products.GetAll();
             return products;
         }
 
@@ -63,7 +63,7 @@ namespace Services
         {
             if (productId > 0)
             {
-                var product = await _unitOfWork.SanPhams.GetById(productId);
+                var product = await _unitOfWork.Products.GetById(productId);
                 if (product is not null)
                 {
                     return product;
@@ -76,7 +76,7 @@ namespace Services
         {
             if (productDetails is not null)
             {
-                var product = await _unitOfWork.SanPhams.GetById(productDetails.ProductId);
+                var product = await _unitOfWork.Products.GetById(productDetails.ProductId);
                 if (product is not null)
                 {
                     //product.TenSanPham = productDetails.TenSanPham;
@@ -86,7 +86,7 @@ namespace Services
 
                     // db chưa đúng
 
-                    _unitOfWork.SanPhams.Update(product);
+                    _unitOfWork.Products.Update(product);
                     var result = _unitOfWork.Save();
 
                     if (result > 0)

@@ -11,12 +11,12 @@ namespace Infrastructure.Repositories
     public class UnitOfWork : IUnitOfWork
     {
         private readonly E_ShopContext _dbContext;
-        public IProductRepository SanPhams { get; }
+        public IProductRepository Products { get; }
 
         public UnitOfWork(E_ShopContext dbContext, IProductRepository sanphamRepo)
         {
             _dbContext = dbContext;
-            SanPhams = sanphamRepo;
+            Products = sanphamRepo;
         }
 
         public void Dispose()
