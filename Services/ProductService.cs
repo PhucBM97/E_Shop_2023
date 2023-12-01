@@ -21,16 +21,13 @@ namespace Services
         {
             if (productDetails is not null)
             {
-                var product = _unitOfWork.Products.GetById(productDetails.ProductId);
-                if( product is null)
-                {
+                //var product = _unitOfWork.Products.GetById(productDetails.ProductId);
                     await _unitOfWork.Products.Add(productDetails);
 
                     var result = _unitOfWork.Save();
 
                     if (result > 0)
                         return true;
-                }
             }
             return false;
         }
