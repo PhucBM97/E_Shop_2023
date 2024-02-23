@@ -73,5 +73,6 @@ namespace E_Shop_2023.Controllers
                 throw ex;
             }
         }
+
     }
 }

@@ -1,6 +1,7 @@
 using Core.Interfaces;
 using Core.Models;
 using Infrastructure.Repositories;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.EntityFrameworkCore;
 using Services;
 using Services.Interfaces;
@@ -12,6 +13,13 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 
+builder.Services.Configure<FormOptions>(options =>
+{
+    //options.ValueLengthLimit = int.MaxValue;
+    //options.MultipartBodyLengthLimit = int.MaxValue;
+    //options.MultipartHeadersLengthLimit = int.MaxValue;
+    options.MemoryBufferThreshold = Int32.MaxValue;
+});
 builder.Services.AddDbContext<E_ShopContext>(options =>
     {
         options.UseSqlServer(builder.Configuration.GetConnectionString("cnnStr"));
@@ -38,6 +46,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseStaticFiles();
 app.UseRouting();
 app.UseCors("corsapp");
 app.UseAuthorization();
