@@ -37,7 +37,7 @@ namespace Core.Models
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseSqlServer("Name=cnnStr");
+                optionsBuilder.UseSqlServer("name=cnnStr");
             }
         }
 
@@ -61,7 +61,8 @@ namespace Core.Models
             modelBuilder.Entity<Cart>(entity =>
             {
                 entity.HasIndex(e => e.CustomerId, "IX_Carts")
-                    .IsUnique();
+                    .IsUnique()
+                    .HasFilter("([CustomerID] IS NOT NULL)");
 
                 entity.Property(e => e.CartId).HasColumnName("CartID");
 
@@ -89,15 +90,17 @@ namespace Core.Models
             {
                 entity.ToTable("Cart_Item");
 
+                entity.HasIndex(e => e.CartId, "IX_Cart_Item_CartID");
+
+                entity.HasIndex(e => e.ProductId, "IX_Cart_Item_ProductID");
+
                 entity.Property(e => e.CartItemId)
                     .ValueGeneratedNever()
                     .HasColumnName("CartItemID");
 
                 entity.Property(e => e.CartId).HasColumnName("CartID");
 
-                entity.Property(e => e.ProductId)
-                    .ValueGeneratedOnAdd()
-                    .HasColumnName("ProductID");
+                entity.Property(e => e.ProductId).HasColumnName("ProductID");
 
                 entity.Property(e => e.Total).HasColumnType("decimal(18, 2)");
 
@@ -115,6 +118,8 @@ namespace Core.Models
 
             modelBuilder.Entity<Category>(entity =>
             {
+                entity.HasIndex(e => e.ParentCategoryId, "IX_Categories_ParentCategoryID");
+
                 entity.Property(e => e.CategoryId).HasColumnName("CategoryID");
 
                 entity.Property(e => e.CreatedDate)
@@ -153,6 +158,10 @@ namespace Core.Models
             modelBuilder.Entity<ColorsSpecific>(entity =>
             {
                 entity.ToTable("Colors_Specific");
+
+                entity.HasIndex(e => e.ColorId, "IX_Colors_Specific_ColorID");
+
+                entity.HasIndex(e => e.ProductId, "IX_Colors_Specific_ProductID");
 
                 entity.Property(e => e.Id).HasColumnName("ID");
 
@@ -206,6 +215,8 @@ namespace Core.Models
 
             modelBuilder.Entity<Image>(entity =>
             {
+                entity.HasIndex(e => e.ProductId, "IX_Images_ProductID");
+
                 entity.Property(e => e.ImageId).HasColumnName("ImageID");
 
                 entity.Property(e => e.Path).IsUnicode(false);
@@ -220,7 +231,11 @@ namespace Core.Models
 
             modelBuilder.Entity<Inventory>(entity =>
             {
-                entity.Property(e => e.InventoryId).HasColumnName("InventoryID");
+                entity.HasKey(e => e.InventoryProsId);
+
+                entity.Property(e => e.InventoryProsId)
+                    .ValueGeneratedOnAdd()
+                    .HasColumnName("Inventory_Pros_Id");
 
                 entity.Property(e => e.CreatedDate)
                     .HasColumnType("datetime")
@@ -229,10 +244,20 @@ namespace Core.Models
                 entity.Property(e => e.UpdatedDate)
                     .HasColumnType("datetime")
                     .HasColumnName("Updated_Date");
+
+                entity.HasOne(d => d.InventoryPros)
+                    .WithOne(p => p.Inventory)
+                    .HasForeignKey<Inventory>(d => d.InventoryProsId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Inventories_Products");
             });
 
             modelBuilder.Entity<Order>(entity =>
             {
+                entity.HasIndex(e => e.CustomerId, "IX_Orders_CustomerID");
+
+                entity.HasIndex(e => e.PaymentId, "IX_Orders_PaymentID");
+
                 entity.Property(e => e.OrderId).HasColumnName("OrderID");
 
                 entity.Property(e => e.CreatedDate)
@@ -268,6 +293,10 @@ namespace Core.Models
 
             modelBuilder.Entity<OrderDetail>(entity =>
             {
+                entity.HasIndex(e => e.OrderId, "IX_OrderDetails_OrderID");
+
+                entity.HasIndex(e => e.ProductId, "IX_OrderDetails_ProductID");
+
                 entity.Property(e => e.OrderDetailId).HasColumnName("OrderDetailID");
 
                 entity.Property(e => e.OrderId).HasColumnName("OrderID");
@@ -308,8 +337,11 @@ namespace Core.Models
 
             modelBuilder.Entity<Product>(entity =>
             {
-                entity.HasIndex(e => e.InventoryId, "IX_Products")
-                    .IsUnique();
+                entity.HasIndex(e => e.BrandId, "IX_Products_BrandID");
+
+                entity.HasIndex(e => e.CategoryId, "IX_Products_CategoryID");
+
+                entity.HasIndex(e => e.PromotionId, "IX_Products_PromotionID");
 
                 entity.Property(e => e.ProductId).HasColumnName("ProductID");
 
@@ -324,8 +356,6 @@ namespace Core.Models
                 entity.Property(e => e.ImageUrl)
                     .IsUnicode(false)
                     .HasColumnName("Image_Url");
-
-                entity.Property(e => e.InventoryId).HasColumnName("InventoryID");
 
                 entity.Property(e => e.OtherProductDetails).HasMaxLength(200);
 
@@ -348,11 +378,6 @@ namespace Core.Models
                     .WithMany(p => p.Products)
                     .HasForeignKey(d => d.CategoryId)
                     .HasConstraintName("FK_Products_Categories");
-
-                entity.HasOne(d => d.Inventory)
-                    .WithOne(p => p.Product)
-                    .HasForeignKey<Product>(d => d.InventoryId)
-                    .HasConstraintName("FK_Products_Inventories");
 
                 entity.HasOne(d => d.Promotion)
                     .WithMany(p => p.Products)
@@ -409,6 +434,10 @@ namespace Core.Models
             modelBuilder.Entity<SizesSpecific>(entity =>
             {
                 entity.ToTable("Sizes_Specific");
+
+                entity.HasIndex(e => e.ProductId, "IX_Sizes_Specific_ProductID");
+
+                entity.HasIndex(e => e.SizeId, "IX_Sizes_Specific_SizeID");
 
                 entity.Property(e => e.Id).HasColumnName("ID");
 
