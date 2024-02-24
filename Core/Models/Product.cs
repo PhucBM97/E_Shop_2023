@@ -17,7 +17,6 @@ namespace Core.Models
         public int ProductId { get; set; }
         public int? PromotionId { get; set; }
         public int? CategoryId { get; set; }
-        public int? InventoryId { get; set; }
         public int? BrandId { get; set; }
         public string? ProductName { get; set; }
         public decimal? Price { get; set; }
@@ -30,8 +29,8 @@ namespace Core.Models
 
         public virtual Brand? Brand { get; set; }
         public virtual Category? Category { get; set; }
-        public virtual Inventory? Inventory { get; set; }
         public virtual Promotion? Promotion { get; set; }
+        public virtual Inventory? Inventory { get; set; }
         public virtual ICollection<CartItem> CartItems { get; set; }
         public virtual ICollection<ColorsSpecific> ColorsSpecifics { get; set; }
         public virtual ICollection<Image> Images { get; set; }

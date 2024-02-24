@@ -20,7 +20,7 @@ namespace E_Shop_2023.Controllers
         public async Task<IActionResult> GetProductList()
         {
             try
-            {
+           {
                 var product = await _prodSrv.GetAllProducts();
                 if (product is null)
                     return NotFound();
@@ -49,7 +49,6 @@ namespace E_Shop_2023.Controllers
                             CreatedDate = DateTime.Now,
                             PromotionId = entity.PromotionId,
                             CategoryId = entity.CategoryId,
-                            InventoryId = entity.InventoryId,
                             BrandId = entity.BrandId,
                             Stock = entity.Stock,
                             ImageUrl = entity.ImageUrl
