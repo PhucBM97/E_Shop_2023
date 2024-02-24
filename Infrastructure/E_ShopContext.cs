@@ -220,6 +220,7 @@ namespace Core.Models
 
             modelBuilder.Entity<Inventory>(entity =>
             {
+                entity.Property(e => e.InventoryId).HasColumnName("InventoryID");
 
                 entity.Property(e => e.CreatedDate)
                     .HasColumnType("datetime")
@@ -307,6 +308,8 @@ namespace Core.Models
 
             modelBuilder.Entity<Product>(entity =>
             {
+                entity.HasIndex(e => e.InventoryId, "IX_Products")
+                    .IsUnique();
 
                 entity.Property(e => e.ProductId).HasColumnName("ProductID");
 
@@ -321,6 +324,8 @@ namespace Core.Models
                 entity.Property(e => e.ImageUrl)
                     .IsUnicode(false)
                     .HasColumnName("Image_Url");
+
+                entity.Property(e => e.InventoryId).HasColumnName("InventoryID");
 
                 entity.Property(e => e.OtherProductDetails).HasMaxLength(200);
 
@@ -343,6 +348,11 @@ namespace Core.Models
                     .WithMany(p => p.Products)
                     .HasForeignKey(d => d.CategoryId)
                     .HasConstraintName("FK_Products_Categories");
+
+                entity.HasOne(d => d.Inventory)
+                    .WithOne(p => p.Product)
+                    .HasForeignKey<Product>(d => d.InventoryId)
+                    .HasConstraintName("FK_Products_Inventories");
 
                 entity.HasOne(d => d.Promotion)
                     .WithMany(p => p.Products)

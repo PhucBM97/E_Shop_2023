@@ -5,11 +5,11 @@ namespace Core.Models
 {
     public partial class Inventory
     {
-        public int InventoryProsId { get; set; }
+        public int InventoryId { get; set; }
         public int? Quantity { get; set; }
         public DateTime? CreatedDate { get; set; }
         public DateTime? UpdatedDate { get; set; }
 
-        public virtual Product InventoryPros { get; set; } = null!;
+        public virtual Product? Product { get; set; }
     }
 }
