@@ -32,6 +32,7 @@ namespace Core.Models
         public virtual DbSet<Promotion> Promotions { get; set; } = null!;
         public virtual DbSet<Size> Sizes { get; set; } = null!;
         public virtual DbSet<SizesSpecific> SizesSpecifics { get; set; } = null!;
+        public virtual DbSet<User> Users { get; set; } = null!;
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -454,6 +455,21 @@ namespace Core.Models
                     .WithMany(p => p.SizesSpecifics)
                     .HasForeignKey(d => d.SizeId)
                     .HasConstraintName("FK_Sizes_Specific_Sizes");
+            });
+
+            modelBuilder.Entity<User>(entity =>
+            {
+                entity.ToTable("User");
+
+                entity.Property(e => e.Email).HasMaxLength(200);
+
+                entity.Property(e => e.FirstName).HasMaxLength(200);
+
+                entity.Property(e => e.LastName).HasMaxLength(200);
+
+                entity.Property(e => e.Password).HasMaxLength(500);
+
+                entity.Property(e => e.Username).HasMaxLength(500);
             });
 
             OnModelCreatingPartial(modelBuilder);

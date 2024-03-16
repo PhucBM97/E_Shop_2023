@@ -15,20 +15,18 @@ builder.Services.AddControllers();
 
 builder.Services.Configure<FormOptions>(options =>
 {
-    //options.ValueLengthLimit = int.MaxValue;
-    //options.MultipartBodyLengthLimit = int.MaxValue;
-    //options.MultipartHeadersLengthLimit = int.MaxValue;
     options.MemoryBufferThreshold = Int32.MaxValue;
 });
+
 builder.Services.AddDbContext<E_ShopContext>(options =>
     {
         options.UseSqlServer(builder.Configuration.GetConnectionString("cnnStr"));
     });
-builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>(); // DI
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IProductService, ProductService>();
 
-builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddEndpointsApiExplorer(); // api
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddCors(p => p.AddPolicy("corsapp", builder =>
@@ -46,10 +44,12 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseStaticFiles();
+app.UseStaticFiles(); // file import
 app.UseRouting();
-app.UseCors("corsapp");
-app.UseAuthorization();
+app.UseCors("corsapp"); // cors
+
+app.UseAuthentication(); //
+app.UseAuthorization(); //
 
 app.MapControllers();
 

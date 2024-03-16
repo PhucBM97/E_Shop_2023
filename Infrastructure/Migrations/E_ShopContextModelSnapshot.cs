@@ -45,7 +45,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("BrandId");
 
-                    b.ToTable("Brands");
+                    b.ToTable("Brands", (string)null);
                 });
 
             modelBuilder.Entity("Core.Models.Cart", b =>
@@ -80,7 +80,7 @@ namespace Infrastructure.Migrations
                         .IsUnique()
                         .HasFilter("[CustomerID] IS NOT NULL");
 
-                    b.ToTable("Carts");
+                    b.ToTable("Carts", (string)null);
                 });
 
             modelBuilder.Entity("Core.Models.CartItem", b =>
@@ -145,7 +145,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("ParentCategoryId");
 
-                    b.ToTable("Categories");
+                    b.ToTable("Categories", (string)null);
                 });
 
             modelBuilder.Entity("Core.Models.Color", b =>
@@ -171,7 +171,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("ColorId");
 
-                    b.ToTable("Colors");
+                    b.ToTable("Colors", (string)null);
                 });
 
             modelBuilder.Entity("Core.Models.ColorsSpecific", b =>
@@ -252,7 +252,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("CustomerId");
 
-                    b.ToTable("Customers");
+                    b.ToTable("Customers", (string)null);
                 });
 
             modelBuilder.Entity("Core.Models.Image", b =>
@@ -276,7 +276,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("Images");
+                    b.ToTable("Images", (string)null);
                 });
 
             modelBuilder.Entity("Core.Models.Inventory", b =>
@@ -301,7 +301,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("InventoryId");
 
-                    b.ToTable("Inventories");
+                    b.ToTable("Inventories", (string)null);
                 });
 
             modelBuilder.Entity("Core.Models.Order", b =>
@@ -346,7 +346,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("PaymentId");
 
-                    b.ToTable("Orders");
+                    b.ToTable("Orders", (string)null);
                 });
 
             modelBuilder.Entity("Core.Models.OrderDetail", b =>
@@ -388,7 +388,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("OrderDetails");
+                    b.ToTable("OrderDetails", (string)null);
                 });
 
             modelBuilder.Entity("Core.Models.Payment", b =>
@@ -417,7 +417,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("PaymentId");
 
-                    b.ToTable("Payments");
+                    b.ToTable("Payments", (string)null);
                 });
 
             modelBuilder.Entity("Core.Models.Product", b =>
@@ -487,7 +487,7 @@ namespace Infrastructure.Migrations
                         .IsUnique()
                         .HasFilter("[InventoryID] IS NOT NULL");
 
-                    b.ToTable("Products");
+                    b.ToTable("Products", (string)null);
                 });
 
             modelBuilder.Entity("Core.Models.Promotion", b =>
@@ -528,7 +528,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("PromotionId");
 
-                    b.ToTable("Promotions");
+                    b.ToTable("Promotions", (string)null);
                 });
 
             modelBuilder.Entity("Core.Models.Size", b =>
@@ -558,7 +558,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("SizeId");
 
-                    b.ToTable("Sizes");
+                    b.ToTable("Sizes", (string)null);
                 });
 
             modelBuilder.Entity("Core.Models.SizesSpecific", b =>
