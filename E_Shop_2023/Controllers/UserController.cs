@@ -1,11 +1,13 @@
 ﻿using Core.Models;
 using E_Shop_2023.Helpers;
+using Infrastructure.DTO;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -37,12 +39,21 @@ namespace E_Shop_2023.Controllers
             if(!PasswordHasher.VerifyPassword(userObj.Password, user.Password))
                 return BadRequest(new { Message = "Password is Incorrect" });
 
+            // tạo token mới từ user
             user.Token = CreateJwt(user);
 
-            return Ok(new
+            var newAccessToken = user.Token;
+
+            // tạo refresh token ( ngẫu nhiên )
+            var newRefreshToken = CreateRefreshToken();
+            user.RefreshToken = newRefreshToken; // gán vào user
+            user.RefreshTokenExpiryTime = DateTime.Now.AddDays(5); // Thời hạn của RefreshToken
+            await _context.SaveChangesAsync();
+            
+            return Ok(new TokenApiDTO
             {
-                Token = user.Token,
-                Message = "Login Success!"
+                AccessToken = newAccessToken,
+                RefreshToken = newRefreshToken
             });
         }
 
@@ -105,7 +116,7 @@ namespace E_Shop_2023.Controllers
             var identity = new ClaimsIdentity(new Claim[]
             {
                 new Claim(ClaimTypes.Role, user.Role),
-                new Claim(ClaimTypes.Name, $"{user.FirstName} {user.LastName}"),
+                new Claim(ClaimTypes.Name, user.Username),
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
             });
 
@@ -116,7 +127,7 @@ namespace E_Shop_2023.Controllers
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = identity,
-                Expires = DateTime.Now.AddDays(1),
+                Expires = DateTime.Now.AddSeconds(10),
                 SigningCredentials = credentials
             };
 
@@ -127,11 +138,90 @@ namespace E_Shop_2023.Controllers
             // header, payload, signature
         }
 
+        private string CreateRefreshToken()
+        {
+            var tokenBytes = RandomNumberGenerator.GetBytes(64);
+
+            var refreshToken = Convert.ToBase64String(tokenBytes);
+            var tokenInUser = _context.Users
+                .Any(a => a.RefreshToken == refreshToken);
+
+            if(tokenInUser)
+                return CreateRefreshToken();
+
+            return refreshToken;
+        }
+
+        private ClaimsPrincipal GetPrincipleFromExpiredToken(string token)
+        {
+            // tạo key bytes
+            var key = Encoding.ASCII.GetBytes("veryverysceret.....123123123123qweqweqweqwe123123123qweqweqweqwewqeqwe123123213");
+            
+            // chuẩn bị các tham số
+            var tokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateAudience = false,
+                ValidateIssuer = false,
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(key),
+                ValidateLifetime = false,
+            };
+            // handler
+            var tokenHandler = new JwtSecurityTokenHandler();
+            // đầu ra
+            SecurityToken securityToken;
+
+            // 3 tham số, token, parameters, out -> security
+            var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out securityToken);
+            
+            var jwtSecurityToken = securityToken as JwtSecurityToken;
+            if (jwtSecurityToken is null || !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
+                throw new SecurityTokenException("This is Invalid Token");
+
+            return principal;
+        }
+
         [Authorize]
         [HttpGet]
         public async Task<ActionResult<User>> GetAllUsers()
         {
             return Ok(await _context.Users.ToListAsync());
+        }
+
+        [HttpPost("refresh")]
+        public async Task<IActionResult> Refresh(TokenApiDTO tokenApiDto)
+        {
+            if (tokenApiDto is null)
+            {
+                return BadRequest(new
+                {
+                    Message = "Invalid Client Request"
+                });
+            }
+            string accessToken = tokenApiDto.AccessToken;
+            string refreshToken = tokenApiDto.RefreshToken;
+            // gọi hàm get Principal lấy thông tin của user đang đăng nhập (access token )
+            var principal = GetPrincipleFromExpiredToken(accessToken);
+
+            var username = principal.Identity.Name;
+
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
+
+            // nếu user tồn tại, refreshtoken của user giống vs refreshtoken gửi về, token còn hạn sử dụng
+            if (user is null || user.RefreshToken != refreshToken || user.RefreshTokenExpiryTime <= DateTime.Now)
+                return BadRequest(new
+                {
+                    Message = "Invalid Request"
+                });
+            var newAccessToken = CreateJwt(user);
+            var newRefreshToken = CreateRefreshToken();
+            user.RefreshToken = newRefreshToken;
+            await _context.SaveChangesAsync();
+            return Ok(new TokenApiDTO
+            {
+                AccessToken = newAccessToken,
+                RefreshToken = newRefreshToken,
+            });
         }
 
 
