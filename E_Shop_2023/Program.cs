@@ -1,10 +1,13 @@
 using Core.Interfaces;
 using Core.Models;
 using Infrastructure.Repositories;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Services;
 using Services.Interfaces;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args); 
 
@@ -19,9 +22,28 @@ builder.Services.Configure<FormOptions>(options =>
 });
 
 builder.Services.AddDbContext<E_ShopContext>(options =>
-    {
+{
         options.UseSqlServer(builder.Configuration.GetConnectionString("cnnStr"));
-    });
+});
+
+builder.Services.AddAuthentication(x =>
+{
+    x.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+    x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(x =>
+{
+    x.RequireHttpsMetadata = false;
+    x.SaveToken = true;
+    x.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("veryverysceret.....123123123123qweqweqweqwe123123123qweqweqweqwewqeqwe123123213")),
+        ValidateAudience = false,
+        ValidateIssuer = false,
+        ClockSkew = TimeSpan.Zero
+    };
+});
+
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>(); // DI
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IProductService, ProductService>();
