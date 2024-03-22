@@ -11,7 +11,7 @@ namespace Services.Interfaces
     {
         Task<bool> CreateProduct(Product productDetails);
 
-        Task<IEnumerable<Product>> GetAllProducts();
+        Task<IEnumerable<Product>> GetAllProducts ();
 
         Task<Product> GetProductById(int productId);
 

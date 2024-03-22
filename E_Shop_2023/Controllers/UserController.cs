@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Services.Interfaces;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -18,10 +19,14 @@ namespace E_Shop_2023.Controllers
     public class UserController : ControllerBase
     {
         private readonly E_ShopContext _context;
+        private readonly IConfiguration _config;
+        private readonly IEmailService _emailService;
 
-        public UserController(E_ShopContext context)
+        public UserController(E_ShopContext context, IConfiguration configuration, IEmailService emailService)
         {
             _context = context;
+            _config = configuration;
+            _emailService = emailService;
         }
 
         [HttpPost("authenticate")]
@@ -224,6 +229,92 @@ namespace E_Shop_2023.Controllers
             });
         }
 
+
+        /// <summary>
+        /// Gửi email reset password
+        /// Sinh ra 1 token reset password
+        /// gửi email người dùng nhập, token trong URL
+        /// </summary>
+        /// <param name="email">Địa chỉ Email của người dùng</param>
+        /// <returns></returns>
+        [HttpPost("send-reset-email/{email}")]
+        public async Task<IActionResult> SendEmail(string email)
+        {
+            // lấy ra user dựa trên email
+            var user = await _context.Users.FirstOrDefaultAsync(a => a.Email == email);
+            if (user is null)
+            {
+                return NotFound(new
+                {
+                    StatusCode = 404,
+                    Message = "email Doesn't Exist"
+                });
+            }
+            // tạo ra refreshToken ( ngẫu nhiên )
+            var tokenBytes = RandomNumberGenerator.GetBytes(64);
+            var emailToken = Convert.ToBase64String(tokenBytes);
+            //
+            user.ResetPasswordToken = emailToken;
+            user.ResetPasswordExpiry = DateTime.Now.AddMinutes(15);
+            //string from = _config["EmailSettings:From"];
+            
+            // khởi tạo đối tượng EmailModel gồm (địa chỉ gửi đến, tiêu đề, nội dung)
+            var emailModel = new EmailModel(email, "Reset Password !!", EmailBody.EmailStringBody(email, emailToken));
+            // gửi mail
+            _emailService.SendEmail(emailModel);
+            _context.Entry(user).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+
+            return Ok(new
+            {
+                StatusCode = 200,
+                Message = "Email Sent!"
+            });
+        }
+
+        /// <summary>
+        /// Lấy token từ user ở Db so sánh vs token ở tham số
+        /// Nếu trùng thì hash password mới rồi gán vào user -> save
+        /// </summary>
+        /// <param name="resetPasswordDto">
+        /// - email người dùng
+        /// - token reset password
+        /// - mật khẩu mới
+        /// </param>
+        /// <returns></returns>
+        [HttpPost("rest-password")]
+        public async Task<IActionResult> ResetPassword(ResetPasswordDTO resetPasswordDto)
+        {
+            var newToken = resetPasswordDto.EmailToken.Replace(" ", "+");
+            var user = await _context.Users.AsNoTracking().FirstOrDefaultAsync(a => a.Email == resetPasswordDto.Email);
+
+            if (user is null)
+            {
+                return NotFound(new
+                {
+                    StatusCode = 404,
+                    Message = "email Doesn't Exist"
+                });
+            } 
+            var tokenCode = user.ResetPasswordToken;
+            DateTime? emailTokenExpiry = user.ResetPasswordExpiry;
+            if (tokenCode != resetPasswordDto.EmailToken || emailTokenExpiry < DateTime.Now)
+            {
+                return BadRequest(new
+                {
+                    StatusCode = 400,
+                    Message = "Invalid Reset link"
+                });
+            }
+            user.Password = PasswordHasher.HashPassword(resetPasswordDto.NewPassword);
+            _context.Entry(user).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+            return Ok(new
+            {
+                StatusCode = 200,
+                Message = "Password Reset Successfully"
+            });
+        }
 
     }
 }

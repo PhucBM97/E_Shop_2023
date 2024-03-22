@@ -38,7 +38,7 @@ namespace Core.Models
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseSqlServer("name=cnnStr");
+                optionsBuilder.UseSqlServer("Name=cnnStr");
             }
         }
 
@@ -470,6 +470,8 @@ namespace Core.Models
                 entity.Property(e => e.Password).HasMaxLength(500);
 
                 entity.Property(e => e.RefreshTokenExpiryTime).HasColumnType("datetime");
+
+                entity.Property(e => e.ResetPasswordExpiry).HasColumnType("datetime");
 
                 entity.Property(e => e.Username).HasMaxLength(500);
             });

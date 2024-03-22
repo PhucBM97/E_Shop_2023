@@ -20,7 +20,7 @@ namespace E_Shop_2023.Controllers
         public async Task<IActionResult> GetProductList()
         {
             try
-          {
+            {
                 var product = await _prodSrv.GetAllProducts();
                 if (product is null)
                     return NotFound();

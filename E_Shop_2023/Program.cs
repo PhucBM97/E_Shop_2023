@@ -45,6 +45,7 @@ builder.Services.AddAuthentication(x =>
 });
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>(); // DI
+builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IProductService, ProductService>();
 
