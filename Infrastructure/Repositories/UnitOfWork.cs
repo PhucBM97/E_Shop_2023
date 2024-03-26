@@ -12,11 +12,16 @@ namespace Infrastructure.Repositories
     {
         private readonly E_ShopContext _dbContext;
         public IProductRepository Products { get; }
+        public IBrandRepository Brands { get; }
 
-        public UnitOfWork(E_ShopContext dbContext, IProductRepository sanphamRepo)
+        public UnitOfWork(
+            E_ShopContext dbContext,
+            IProductRepository sanphamRepo,
+            IBrandRepository brands)
         {
             _dbContext = dbContext;
             Products = sanphamRepo;
+            Brands = brands;
         }
 
         public void Dispose()

@@ -1,5 +1,6 @@
 ﻿using Core.Interfaces;
 using Core.Models;
+using Infrastructure.DTO;
 using Services.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -53,6 +54,14 @@ namespace Services
         public async Task<IEnumerable<Product>> GetAllProducts()
         {
             var products = await _unitOfWork.Products.GetAll();
+
+            var brands = await _unitOfWork.Brands.GetAll();
+
+            foreach (var item in products)
+            {
+                item.Brand = brands.Where(p => p.BrandId == item.BrandId).FirstOrDefault();
+            }
+
             return products;
         }
 
@@ -101,6 +110,19 @@ namespace Services
                 }
             }
             return false;
+        }
+
+        public async Task<IEnumerable<Product>> GetProductByBrand(int brandId)
+        {
+            var products = await _unitOfWork.Products.GetDataWithPredicate(p => p.BrandId == brandId);
+
+            var brands = await _unitOfWork.Brands.GetAll();
+
+            foreach (var item in products)
+            {
+                item.Brand = brands.Where(p => p.BrandId == item.BrandId).FirstOrDefault();
+            }
+            return products;
         }
     }
 }

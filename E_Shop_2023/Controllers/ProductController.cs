@@ -1,5 +1,6 @@
 ﻿using Core.Models;
 using Infrastructure.DTO;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Services.Interfaces;
@@ -16,7 +17,7 @@ namespace E_Shop_2023.Controllers
             _prodSrv = sanPhamService;
         }
 
-        [HttpGet]
+        [HttpGet("GetProductList")]
         public async Task<IActionResult> GetProductList()
         {
             try
@@ -33,14 +34,25 @@ namespace E_Shop_2023.Controllers
             }
         }
 
-        [HttpPost]
+        [HttpGet("GetProductByBrand")]
+        public async Task<IActionResult> GetProductByBrand(int brandId)
+        {
+            var products = await _prodSrv.GetProductByBrand(brandId);
+            if(!products.Any())
+                return NotFound();
+            return Ok(products);
+        }
+
+        [HttpPost("AddProduct")]
         public async Task<IActionResult> AddProduct(ProductDTO entity)
         {
             try
             {
-                if (entity is not null)
-                {
-                    //var product = await _prodSrv.GetProductById(entity.ProductId);
+                if (entity is null)
+                    return BadRequest(new
+                    {
+                        Message = "Entity is null"
+                    });
                         var model = new Product
                         {
                             ProductName = entity.ProductName,
@@ -54,17 +66,17 @@ namespace E_Shop_2023.Controllers
                             ImageUrl = entity.ImageUrl
                         };
                         var result = await _prodSrv.CreateProduct(model);
-                        if (result)
+                        if (!result)
                         {
-                            return Ok(entity);
+                            return BadRequest(new
+                            {
+                                Message = "Fail"
+                            });
                         }
-                        else
-                        {
-                            return BadRequest(result);
-                        }
-
-                }
-                return BadRequest("Sản phẩm đã tồn tại");
+                return Ok(new
+                {
+                    Message = "Product Added"
+                });
             }
             catch (Exception ex)
             {

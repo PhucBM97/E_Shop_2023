@@ -26,6 +26,12 @@ builder.Services.AddDbContext<E_ShopContext>(options =>
         options.UseSqlServer(builder.Configuration.GetConnectionString("cnnStr"));
 });
 
+builder.Services.AddControllersWithViews()
+    .AddNewtonsoftJson(options =>
+    options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+);
+
+
 builder.Services.AddAuthentication(x =>
 {
     x.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -48,6 +54,8 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>(); // DI
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<IBrandRepository, BrandRepository>();
+builder.Services.AddScoped<IBrandService, BrandService>();
 
 builder.Services.AddEndpointsApiExplorer(); // api
 builder.Services.AddSwaggerGen();

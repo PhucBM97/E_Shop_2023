@@ -18,5 +18,9 @@ namespace Services.Interfaces
         Task<bool> UpdateProduct(Product productDetails);
 
         Task<bool> DeleteProduct(int productId);
+
+        Task<IEnumerable<Product>> GetProductByBrand(int brandId);
+
+
     }
 }
