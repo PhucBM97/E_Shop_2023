@@ -85,5 +85,15 @@ namespace E_Shop_2023.Controllers
             }
         }
 
+        [HttpGet("GetProductById/{productId}")]
+        public async Task<IActionResult> GetProductById(int productId)
+        {
+            var product = _prodSrv.GetProductById(productId);
+            if (product is null)
+                return NotFound();
+            return Ok(product.Result);
+        }
+
+
     }
 }

@@ -70,6 +70,11 @@ namespace Services
             if (productId > 0)
             {
                 var product = await _unitOfWork.Products.GetById(productId);
+
+                var images = await _unitOfWork.Images.GetDataWithPredicate(p => p.ProductId == product.ProductId);
+
+                product.Images = (ICollection<Image>)images;
+                
                 if (product is not null)
                 {
                     return product;

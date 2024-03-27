@@ -11,6 +11,8 @@ namespace Core.Interfaces
         IProductRepository Products { get; }
 
         IBrandRepository Brands { get; }
+
+        IImageRepository Images { get; }
         
 
         int Save();
