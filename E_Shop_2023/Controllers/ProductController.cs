@@ -25,8 +25,21 @@ namespace E_Shop_2023.Controllers
                 var product = await _prodSrv.GetAllProducts();
                 if (product is null)
                     return NotFound();
+                var model = new List<ProductDetailDTO>();
+                foreach (var info in product)
+                {
+                    model.Add(new ProductDetailDTO
+                    {
+                        ProductID = info.ProductId,
+                        ProductBrand = info.Brand?.BrandName,
+                        ProductImage = info.ImageUrl,
+                        ProductName = info.ProductName,
+                        ProductPrice = info.Price,
+                        ProductQuantity = 1
+                    });
+                }
 
-                return Ok(product);
+                return Ok(model);
             }
             catch (Exception ex)
             {
