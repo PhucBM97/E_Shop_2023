@@ -1,4 +1,4 @@
-using Core.Interfaces;
+﻿using Core.Interfaces;
 using Core.Models;
 using Infrastructure.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -14,6 +14,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 
 builder.Services.AddControllers();
+builder.Services.AddMemoryCache(); // bộ nhớ đệm, có rồi thì lấy ra ( trong ram ), chưa có thì lấy db
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 
 builder.Services.Configure<FormOptions>(options =>
@@ -50,14 +51,21 @@ builder.Services.AddAuthentication(x =>
     };
 });
 
-builder.Services.AddScoped<IUnitOfWork, UnitOfWork>(); // DI
-builder.Services.AddScoped<IEmailService, EmailService>();
-builder.Services.AddScoped<IProductRepository, ProductRepository>();
-builder.Services.AddScoped<IProductService, ProductService>();
-builder.Services.AddScoped<IBrandRepository, BrandRepository>();
-builder.Services.AddScoped<IBrandService, BrandService>();
-builder.Services.AddScoped<IImageRepository, ImageRepository>();
-builder.Services.AddScoped<IImageService, ImageService>();
+builder.Services.AddTransient<IUnitOfWork, UnitOfWork>(); // DI
+builder.Services.AddTransient<IEmailService, EmailService>();
+builder.Services.AddTransient<IProductRepository, ProductRepository>();
+builder.Services.AddTransient<IProductService, ProductService>();
+builder.Services.AddTransient<IBrandRepository, BrandRepository>();
+builder.Services.AddTransient<IBrandService, BrandService>();
+builder.Services.AddTransient<IImageRepository, ImageRepository>();
+builder.Services.AddTransient<IImageService, ImageService>();
+
+builder.Services.AddTransient(typeof(ICustomerRepository), typeof(CustomerRepository));
+builder.Services.AddTransient(typeof(ICustomerService), typeof(CustomerService));
+builder.Services.AddTransient(typeof(IOrderRepository), typeof(OrderRepository));
+builder.Services.AddTransient(typeof(IOrderService), typeof(OrderService));
+builder.Services.AddTransient(typeof(IOrderDetailRepository), typeof(OrderDetailReposiotry));
+builder.Services.AddTransient(typeof(IOrderDetailService), typeof(OrderDetailService));
 
 builder.Services.AddEndpointsApiExplorer(); // api
 builder.Services.AddSwaggerGen();

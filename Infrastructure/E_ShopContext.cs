@@ -185,9 +185,7 @@ namespace Core.Models
             {
                 entity.Property(e => e.CustomerId).HasColumnName("CustomerID");
 
-                entity.Property(e => e.Address)
-                    .HasMaxLength(10)
-                    .IsFixedLength();
+                entity.Property(e => e.Address).HasMaxLength(500);
 
                 entity.Property(e => e.CreatedDate)
                     .HasColumnType("datetime")
@@ -266,6 +264,8 @@ namespace Core.Models
                     .HasColumnName("Created_Date");
 
                 entity.Property(e => e.CustomerId).HasColumnName("CustomerID");
+
+                entity.Property(e => e.Delivery).HasMaxLength(50);
 
                 entity.Property(e => e.OrderDate)
                     .HasColumnType("datetime")

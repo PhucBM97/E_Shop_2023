@@ -1,10 +1,5 @@
 ﻿using Core.Interfaces;
 using Core.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Infrastructure.Repositories
 {
@@ -15,17 +10,28 @@ namespace Infrastructure.Repositories
         public IBrandRepository Brands { get; }
         public IImageRepository Images { get; }
 
+        public ICustomerRepository Customers { get; }
+
+        public IOrderRepository Orders {get; }
+
+        public IOrderDetailRepository OrderDetails { get; }
+
         public UnitOfWork(
             E_ShopContext dbContext,
             IProductRepository sanphamRepo,
             IBrandRepository brands,
-            IImageRepository images)
+            IImageRepository images,
+            ICustomerRepository customers,
+            IOrderRepository orders,
+            IOrderDetailRepository orderDetails)
         {
             _dbContext = dbContext;
             Products = sanphamRepo;
             Brands = brands;
             Images = images;
-
+            Customers = customers;
+            Orders = orders;
+            OrderDetails = orderDetails;
         }
 
         public void Dispose()

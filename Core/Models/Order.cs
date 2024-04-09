@@ -15,6 +15,7 @@ namespace Core.Models
         public int? CustomerId { get; set; }
         public int? OrderStatusCode { get; set; }
         public DateTime? OrderDate { get; set; }
+        public string? Delivery { get; set; }
         public decimal? Total { get; set; }
         public DateTime? CreatedDate { get; set; }
         public DateTime? UpdatedDate { get; set; }

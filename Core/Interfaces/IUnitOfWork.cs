@@ -13,7 +13,12 @@ namespace Core.Interfaces
         IBrandRepository Brands { get; }
 
         IImageRepository Images { get; }
-        
+
+        ICustomerRepository Customers { get; }
+        IOrderRepository Orders { get; }
+
+        IOrderDetailRepository OrderDetails { get; }
+
 
         int Save();
     }
