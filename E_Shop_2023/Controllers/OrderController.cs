@@ -69,9 +69,9 @@ namespace E_Shop_2023.Controllers
                 {
                     ProductId = info.ProductId,
                     OrderId = orderId,
-                    Quantity = info.Quantity,
-                    Price = info.Price,
-                    SubTotal = info.SubTotal,
+                    Quantity = info.ProductQuantity,
+                    Price = info.ProductPrice,
+                    SubTotal = info.ProductSubTotal,
                 });
             }
             return Ok(new
@@ -81,19 +81,5 @@ namespace E_Shop_2023.Controllers
 
         }
 
-        [HttpPost("addor")]
-        public async Task<IActionResult> addor(OrderDTO entity)
-        {
-            var result = await _orderSrv.AddOrder(new Order
-            {
-                PaymentId = 1,
-                CustomerId = 1,
-                Delivery = "home",
-                Total = 1000000,
-            });
-            if (result == 0)
-                return BadRequest();
-            return Ok(result);
-        }
     }
 }
