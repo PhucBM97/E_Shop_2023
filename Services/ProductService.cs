@@ -3,6 +3,7 @@ using Core.Models;
 using Infrastructure.DTO;
 using Services.Interfaces;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -18,19 +19,31 @@ namespace Services
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<bool> CreateProduct(Product productDetails)
+        public async Task<bool> CreateProduct(ProductDTO product)
         {
-            if (productDetails is not null)
+            if (product is not null)
             {
                 //var product = _unitOfWork.Products.GetById(productDetails.ProductId);
-                    await _unitOfWork.Products.Add(productDetails);
+                var model = new Product
+                {
+                    ProductName = product.ProductName,
+                    Price = product.Price,
+                    Description = product.Description,
+                    CreatedDate = DateTime.Now,
+                    PromotionId = product.PromotionId,
+                    CategoryId = product.CategoryId,
+                    BrandId = product.BrandId,
+                    Stock = product.Stock,
+                    ImageUrl = product.ImageUrl
+                };
+            await _unitOfWork.Products.Add(model);
 
-                    var result = _unitOfWork.Save();
+            var result = _unitOfWork.Save();
 
-                    if (result > 0)
-                        return true;
+            if (result <= 0)
+                return false;
             }
-            return false;
+            return true;
         }
 
         public async Task<bool> DeleteProduct(int productId)
@@ -83,38 +96,32 @@ namespace Services
             return null;
         }
 
-        public async Task<bool> UpdateProduct(Product productDetails)
+        public async Task<bool> UpdateProduct(ProductDTO product)
         {
-            if (productDetails is not null)
-            {
-                var product = await _unitOfWork.Products.GetById(productDetails.ProductId);
-                if (product is not null)
-                {
-                    //product.ProductName = productDetails.ProductName;
-                    //product.Cpu = productDetails.Cpu;
-                    //product.Gpu = productDetails.Gpu;
-                    //product.HardDisks = productDetails.HardDisks;
-                    //product.Camera = productDetails.Camera;
-                    //product.Selfie = productDetails.Selfie;
-                    //product.Screen = productDetails.Screen;
-                    //product.Ram = productDetails.Ram;
-                    //product.Description = productDetails.Description;
-                    //product.ImageUrl = productDetails.ImageUrl;
-                    //product.Price = productDetails.Price;
-                    //product.OtherProductDetails = productDetails.OtherProductDetails;
-                    //product.ProductTypeId = productDetails.ProductTypeId;
-                    //product.PromotionId = productDetails.PromotionId;
-                    //product.Weight = productDetails.Weight;
+            if(product is null)
+                return false;
+            
+            var model = await _unitOfWork.Products.GetById(product.ProductId);
 
+            if (model is null)
+                return false;
 
-                    _unitOfWork.Products.Update(product);
-                    var result = _unitOfWork.Save();
+            model.ProductName = product.ProductName;
+            model.Price = product.Price;
+            model.Description = product.Description;
+            model.UpdatedDate = DateTime.Now;
+            model.PromotionId = product.PromotionId;
+            model.CategoryId = product.CategoryId;
+            model.BrandId = product.BrandId;
+            model.Stock = product.Stock;
+            model.ImageUrl = product.ImageUrl;
 
-                    if (result > 0)
-                        return true;
-                }
-            }
-            return false;
+            _unitOfWork.Products.Update(model);
+            var result = _unitOfWork.Save();
+            if (result <= 0)
+                return false;
+
+            return true;
         }
 
         public async Task<IEnumerable<Product>> GetProductByBrand(int brandId)

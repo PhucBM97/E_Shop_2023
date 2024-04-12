@@ -24,6 +24,7 @@ namespace Core.Models
         public string? ImageUrl { get; set; }
         public string? Description { get; set; }
         public string? OtherProductDetails { get; set; }
+        public bool? IsDeleted { get; set; }
         public DateTime? CreatedDate { get; set; }
         public DateTime? UpdatedDate { get; set; }
 

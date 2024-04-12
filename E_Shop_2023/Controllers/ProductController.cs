@@ -1,7 +1,5 @@
 ﻿using Core.Models;
 using Infrastructure.DTO;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Services.Interfaces;
 
@@ -57,35 +55,25 @@ namespace E_Shop_2023.Controllers
         }
 
         [HttpPost("AddProduct")]
-        public async Task<IActionResult> AddProduct(ProductDTO entity)
+        public async Task<IActionResult> AddProduct([FromBody] ProductDTO entity)
         {
             try
             {
-                if (entity is null)
-                    return BadRequest(new
-                    {
-                        Message = "Entity is null"
-                    });
-                        var model = new Product
-                        {
-                            ProductName = entity.ProductName,
-                            Price = entity.Price,
-                            Description = entity.Description,
-                            CreatedDate = DateTime.Now,
-                            PromotionId = entity.PromotionId,
-                            CategoryId = entity.CategoryId,
-                            BrandId = entity.BrandId,
-                            Stock = entity.Stock,
-                            ImageUrl = entity.ImageUrl
-                        };
-                        var result = await _prodSrv.CreateProduct(model);
-                        if (!result)
-                        {
-                            return BadRequest(new
-                            {
-                                Message = "Fail"
-                            });
-                        }
+            if (entity is null)
+                return BadRequest(new
+                {
+                    Message = "Entity is null"
+                });
+
+            var result = await _prodSrv.CreateProduct(entity);
+            if (!result)
+            {
+                return BadRequest(
+                new
+                {
+                    Message = "Fail"
+                });
+            }
                 return Ok(new
                 {
                     Message = "Product Added"
@@ -96,6 +84,39 @@ namespace E_Shop_2023.Controllers
 
                 throw ex;
             }
+        }
+
+        [HttpPut("UpdateProduct")]
+        public async Task<IActionResult> UpdateProduct([FromBody] ProductDTO entity)
+        {
+            if (entity.ProductId <= 0)
+            {
+                return BadRequest(new
+                {
+                    Message = "entity is null"
+                }); ;
+            }
+            var result = await _prodSrv.UpdateProduct(entity);
+
+            if(!result)
+            {
+                return BadRequest(new
+                {
+                    Message = "Update Failed !"
+                });
+            }
+
+            return Ok(new
+            {
+                Message = "Update successful"
+            });
+        }
+
+        [HttpDelete("DeleteProduct/{id}")]
+        public async Task<IActionResult> DeleteProduct(int id)
+        {
+            return Ok();
+            // size specific, color specific, images, order detail, inventories
         }
 
         [HttpGet("GetProductById/{productId}")]

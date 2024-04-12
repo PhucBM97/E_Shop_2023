@@ -81,7 +81,7 @@ namespace E_Shop_2023.Controllers
 
 
             userObj.Password = PasswordHasher.HashPassword(userObj.Password);
-            userObj.Role = "User";
+            //userObj.Role = "User";
             userObj.Token = "";
             await _context.Users.AddAsync(userObj);
             await _context.SaveChangesAsync();
@@ -99,7 +99,7 @@ namespace E_Shop_2023.Controllers
             if (pass.Length < 9)
                 sb.Append("Minimum password length should be 8" + Environment.NewLine);
             if (!(Regex.IsMatch(pass, "[a-z]") && Regex.IsMatch(pass, "[A-Z]") && Regex.IsMatch(pass, "[0-9]")))
-                sb.Append("Password should be AlphaNumeric" + Environment.NewLine);
+                sb.Append("Password should be AlphaNumeric or at least 1 Capital letter" + Environment.NewLine);
             if (!Regex.IsMatch(pass, "[<,>,@,!,#,$,%,^,&,*,(,),_,+,\\[,\\],{,},?,:,;,|,',\\,.,/,~,`,-,=]"))
                 sb.Append("Password should contain special charcter" + Environment.NewLine);
             return sb.ToString();
@@ -316,5 +316,30 @@ namespace E_Shop_2023.Controllers
             });
         }
 
+        [HttpDelete("removeUser/{id}")]
+        public async Task<IActionResult> RemoveUser(int id)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(p => p.Id == id);
+            if (user is null)
+                return NotFound(new
+                {
+                    Message = "User not exist"
+                });
+
+            _context.Users.Remove(user);
+            var result = _context.SaveChanges();
+
+            if (result < 0)
+                return BadRequest(new
+                {
+                    Message = "Xảy ra lỗi khi xóa !"
+                });
+
+
+            return Ok(new
+            {
+                Message = "Successfully"
+            });
+        }
     }
 }
