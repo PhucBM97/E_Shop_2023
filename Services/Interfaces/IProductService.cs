@@ -12,7 +12,8 @@ namespace Services.Interfaces
     {
         Task<bool> CreateProduct(ProductDTO productDetails);
 
-        Task<IEnumerable<Product>> GetAllProducts ();
+        Task<IEnumerable<Product>> GetProductWithPagination(int currentPage, int pageSize = 10);
+        Task<IEnumerable<Product>> GetAllProducts();
 
         Task<Product> GetProductById(int productId);
 
@@ -20,7 +21,7 @@ namespace Services.Interfaces
 
         Task<bool> DeleteProduct(int productId);
 
-        Task<IEnumerable<Product>> GetProductByBrand(int brandId);
+        Task<IEnumerable<Product>> GetProductByBrand(int brandId, int currentPage, int pageSize = 6);
 
 
     }
