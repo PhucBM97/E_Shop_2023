@@ -74,7 +74,10 @@ namespace Infrastructure.Repositories
         {
             try
             {
-                _dbContext.Entry(entity).State = EntityState.Detached;
+                foreach (var entt in _dbContext.ChangeTracker.Entries())
+                {
+                    entt.State = EntityState.Detached;
+                }
                 _dbSet.Remove(entity);
                 return true;
             }
