@@ -9,10 +9,16 @@ namespace E_Shop_2023.Controllers
     [ApiController]
     public class ProductController : ControllerBase
     {
-        public readonly IProductService _prodSrv;
-        public ProductController(IProductService sanPhamService)
+        private readonly IProductService _prodSrv;
+        private readonly IFileService _fileSrv;
+        private readonly IImageService _imageSrv;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        public ProductController(IProductService sanPhamService, IFileService fileService, IImageService imageService, IHttpContextAccessor httpContextAccessor)
         {
             _prodSrv = sanPhamService;
+            _fileSrv = fileService;
+            _imageSrv = imageService;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         [HttpGet("GetProductList/{currentPage}/{pageSize}")]
@@ -108,62 +114,146 @@ namespace E_Shop_2023.Controllers
         }
 
         [HttpPost("AddProduct")]
-        public async Task<IActionResult> AddProduct([FromBody] ProductDTO entity)
+        public async Task<IActionResult> AddProduct([FromForm] AddProductDTO entity) // dùng form thì [fromform]
         {
-            try
-            {
+            var request = _httpContextAccessor.HttpContext.Request;
+            var domain = $"{request.Scheme}://{request.Host}";
+
             if (entity is null)
                 return BadRequest(new
                 {
-                    Message = "Entity is null"
-                });
-
-            var result = await _prodSrv.CreateProduct(entity);
-            if (!result)
-            {
-                return BadRequest(
-                new
-                {
-                    Message = "Fail"
-                });
-            }
-                return Ok(new
-                {
-                    Message = "Product Added"
-                });
-            }
-            catch (Exception ex)
-            {
-
-                throw ex;
-            }
-        }
-
-        [HttpPut("UpdateProduct")]
-        public async Task<IActionResult> UpdateProduct([FromBody] ProductDTO entity)
-        {
-            if (entity.ProductId <= 0)
-            {
-                return BadRequest(new
-                {
                     Message = "entity is null"
-                }); ;
-            }
-            var result = await _prodSrv.UpdateProduct(entity);
-
-            if(!result)
-            {
-                return BadRequest(new
-                {
-                    Message = "Update Failed !"
                 });
+
+            var listImageUrl = new List<string>();
+            foreach (var image in entity.Images)
+            {
+                var imgUrl = $"{domain}{await _fileSrv.UploadFile(image)}";
+                listImageUrl.Add(imgUrl);
             }
+
+            int add_Or_Update_Result = 0;
+
+            // add
+            if(entity.ProductId <= 0)
+            {
+                var product = new Product
+                {
+                    ProductId = entity.ProductId,
+                    ProductName = entity.ProductName,
+                    Price = entity.ProductPrice,
+                    Description = entity.ProductDescription,
+                    CreatedDate = DateTime.Now,
+                    PromotionId = 1,
+                    CategoryId = entity.ProductCategory,
+                    BrandId = entity.ProductBrand,
+                    ImageUrl = listImageUrl.FirstOrDefault(),
+                    Stock = true,
+                    IsDeleted = false
+                };
+
+                add_Or_Update_Result = await _prodSrv.CreateProduct(product);
+
+                if (add_Or_Update_Result <= 0)
+                    return BadRequest(new
+                    {
+                        Message = "Add new product failed!"
+                    });
+
+                foreach (var url in listImageUrl.Skip(1))
+                {
+                    await _imageSrv.CreateImage(new Image
+                    {
+                        ProductId = add_Or_Update_Result,
+                        Path = url
+                    });
+                }
+            }
+            // update
+            else
+            {
+                var existModel = await _prodSrv.GetProductById(entity.ProductId);
+                if (existModel is null)
+                    return NotFound(new
+                    {
+                        Message = "Not found product !"
+                    });
+
+                    existModel.ProductName = entity.ProductName;
+                    existModel.Price = entity.ProductPrice;
+                    existModel.Description = entity.ProductDescription;
+                    existModel.UpdatedDate = DateTime.Now;
+                    existModel.PromotionId = 1;
+                    existModel.CategoryId = entity.ProductCategory;
+                    existModel.BrandId = entity.ProductBrand;
+                    existModel.ImageUrl = listImageUrl.FirstOrDefault();
+                    existModel.Stock = true;
+                    existModel.IsDeleted = false;
+
+                add_Or_Update_Result = _prodSrv.UpdateProduct(existModel);
+
+                if(add_Or_Update_Result <= 0)
+                    return BadRequest(new
+                    {
+                        Message = "Product update failed !"
+                    });
+
+                var exitsImg = await _imageSrv.GetIamgesByProductId(existModel.ProductId);
+
+                // delete -> add
+                if (exitsImg.Any())
+                {
+                    foreach (var img in exitsImg)
+                    {
+                        _imageSrv.DeleteImage(img);
+                    }
+                }
+                //
+                foreach (var url in listImageUrl.Skip(1))
+                {
+                    await _imageSrv.CreateImage(new Image
+                    {
+                        ProductId = add_Or_Update_Result,
+                        Path = url
+                    });
+                }
+
+            }
+
+            //if (!imgResult)
+            //    return BadRequest();
 
             return Ok(new
             {
-                Message = "Update successful"
+                Message = "Successful"
             });
         }
+
+        //[HttpPut("UpdateProduct")]
+        //public async Task<IActionResult> UpdateProduct([FromBody] ProductDTO entity)
+        //{
+        //    if (entity.ProductId <= 0)
+        //    {
+        //        return BadRequest(new
+        //        {
+        //            Message = "entity is null"
+        //        }); ;
+        //    }
+        //    var result = await _prodSrv.UpdateProduct(entity);
+
+        //    if(!result)
+        //    {
+        //        return BadRequest(new
+        //        {
+        //            Message = "Update Failed !"
+        //        });
+        //    }
+
+        //    return Ok(new
+        //    {
+        //        Message = "Update successful"
+        //    });
+        //}
 
         [HttpDelete("DeleteProduct/{id}")]
         public async Task<IActionResult> DeleteProduct(int id)

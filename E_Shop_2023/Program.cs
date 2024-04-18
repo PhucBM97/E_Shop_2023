@@ -25,6 +25,9 @@ builder.Services.Configure<FormOptions>(options =>
 builder.Services.AddDbContext<E_ShopContext>(options =>
 {
         options.UseSqlServer(builder.Configuration.GetConnectionString("cnnStr"));
+        options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
+        options.EnableSensitiveDataLogging();
+
 });
 
 builder.Services.AddControllersWithViews()
@@ -51,28 +54,34 @@ builder.Services.AddAuthentication(x =>
     };
 });
 
-builder.Services.AddTransient<IUnitOfWork, UnitOfWork>(); // DI
-builder.Services.AddTransient<IEmailService, EmailService>();
-builder.Services.AddTransient<IProductRepository, ProductRepository>();
-builder.Services.AddTransient<IProductService, ProductService>();
-builder.Services.AddTransient<IBrandRepository, BrandRepository>();
-builder.Services.AddTransient<IBrandService, BrandService>();
-builder.Services.AddTransient<IImageRepository, ImageRepository>();
-builder.Services.AddTransient<IImageService, ImageService>();
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>(); // DI
+builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
+builder.Services.AddTransient<IHttpContextAccessor, HttpContextAccessor>();
+builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<IBrandRepository, BrandRepository>();
+builder.Services.AddScoped<IBrandService, BrandService>();
+builder.Services.AddScoped<IImageRepository, ImageRepository>();
+builder.Services.AddScoped<IImageService, ImageService>();
 
-builder.Services.AddTransient(typeof(ICustomerRepository), typeof(CustomerRepository));
-builder.Services.AddTransient(typeof(ICustomerService), typeof(CustomerService));
-builder.Services.AddTransient(typeof(IOrderRepository), typeof(OrderRepository));
-builder.Services.AddTransient(typeof(IOrderService), typeof(OrderService));
-builder.Services.AddTransient(typeof(IOrderDetailRepository), typeof(OrderDetailReposiotry));
-builder.Services.AddTransient(typeof(IOrderDetailService), typeof(OrderDetailService));
+builder.Services.AddScoped(typeof(ICustomerRepository), typeof(CustomerRepository));
+builder.Services.AddScoped(typeof(ICustomerService), typeof(CustomerService));
+builder.Services.AddScoped(typeof(IOrderRepository), typeof(OrderRepository));
+builder.Services.AddScoped(typeof(IOrderService), typeof(OrderService));
+builder.Services.AddScoped(typeof(IOrderDetailRepository), typeof(OrderDetailReposiotry));
+builder.Services.AddScoped(typeof(IOrderDetailService), typeof(OrderDetailService));
+builder.Services.AddScoped(typeof(ICategoryRepository), typeof(CategoryRepository));
+builder.Services.AddScoped(typeof(ICategoryService), typeof(CategoryService));
+builder.Services.AddScoped(typeof(IFileService), typeof(FileService));
 
 builder.Services.AddEndpointsApiExplorer(); // api
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddCors(p => p.AddPolicy("corsapp", builder =>
 {
-    builder.WithOrigins("*").AllowAnyMethod().AllowAnyHeader();
+    builder.WithOrigins("http://localhost:4200") // FE
+               .AllowAnyMethod()
+               .AllowAnyHeader();
 }));
 
 var app = builder.Build();

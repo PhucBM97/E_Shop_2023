@@ -10,14 +10,14 @@ namespace Services.Interfaces
 {
     public interface IProductService
     {
-        Task<bool> CreateProduct(ProductDTO productDetails);
+        Task<int> CreateProduct(Product productDetails);
 
         Task<IEnumerable<Product>> GetProductWithPagination(int currentPage, int pageSize = 10);
         Task<IEnumerable<Product>> GetAllProducts();
 
         Task<Product> GetProductById(int productId);
 
-        Task<bool> UpdateProduct(ProductDTO productDetails);
+        public int UpdateProduct(Product product);
 
         Task<bool> DeleteProduct(int productId);
 

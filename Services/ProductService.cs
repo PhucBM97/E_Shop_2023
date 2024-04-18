@@ -1,6 +1,7 @@
 ﻿using Core.Interfaces;
 using Core.Models;
 using Infrastructure.DTO;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Services.Interfaces;
 
 namespace Services
@@ -13,32 +14,34 @@ namespace Services
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<bool> CreateProduct(ProductDTO product)
+        public async Task<int> CreateProduct(Product product)
         {
             if (product is not null)
             {
                 //var product = _unitOfWork.Products.GetById(productDetails.ProductId);
-                var model = new Product
-                {
-                    ProductName = product.ProductName,
-                    Price = product.Price,
-                    Description = product.Description,
-                    CreatedDate = DateTime.Now,
-                    PromotionId = product.PromotionId,
-                    CategoryId = product.CategoryId,
-                    BrandId = product.BrandId,
-                    Stock = product.Stock,
-                    ImageUrl = product.ImageUrl,
-                    IsDeleted = false
-                };
-            await _unitOfWork.Products.Add(model);
+                //var model = new Product
+                //{
+                //    ProductName = product.ProductName,
+                //    Price = product.Price,
+                //    Description = product.Description,
+                //    CreatedDate = DateTime.Now,
+                //    PromotionId = product.PromotionId,
+                //    CategoryId = product.CategoryId,
+                //    BrandId = product.BrandId,
+                //    Stock = product.Stock,
+                //    ImageUrl = product.ImageUrl,
+                //    IsDeleted = false
+                //};
+            await _unitOfWork.Products.Add(product);
 
             var result = _unitOfWork.Save();
 
             if (result <= 0)
-                return false;
+                return 0;
             }
-            return true;
+
+            var id = product.ProductId;
+            return id;
         }
 
         public async Task<bool> DeleteProduct(int productId)
@@ -103,32 +106,17 @@ namespace Services
             return null;
         }
 
-        public async Task<bool> UpdateProduct(ProductDTO product)
+        public int UpdateProduct(Product product)
         {
             if(product is null)
-                return false;
-            
-            var model = await _unitOfWork.Products.GetById(product.ProductId);
+                return 0;
 
-            if (model is null)
-                return false;
-
-            model.ProductName = product.ProductName;
-            model.Price = product.Price;
-            model.Description = product.Description;
-            model.UpdatedDate = DateTime.Now;
-            model.PromotionId = product.PromotionId;
-            model.CategoryId = product.CategoryId;
-            model.BrandId = product.BrandId;
-            model.Stock = product.Stock;
-            model.ImageUrl = product.ImageUrl;
-
-            _unitOfWork.Products.Update(model);
+            _unitOfWork.Products.Update(product);
             var result = _unitOfWork.Save();
             if (result <= 0)
-                return false;
+                return 0;
 
-            return true;
+            return product.ProductId;
         }
 
         public async Task<IEnumerable<Product>> GetProductByBrand(int brandId, int currentPage, int pageSize = 6)

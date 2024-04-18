@@ -16,6 +16,8 @@ namespace Infrastructure.Repositories
 
         public IOrderDetailRepository OrderDetails { get; }
 
+        public ICategoryRepository Categorys { get; }
+
         public UnitOfWork(
             E_ShopContext dbContext,
             IProductRepository sanphamRepo,
@@ -23,7 +25,8 @@ namespace Infrastructure.Repositories
             IImageRepository images,
             ICustomerRepository customers,
             IOrderRepository orders,
-            IOrderDetailRepository orderDetails)
+            IOrderDetailRepository orderDetails,
+            ICategoryRepository categorys)
         {
             _dbContext = dbContext;
             Products = sanphamRepo;
@@ -32,6 +35,7 @@ namespace Infrastructure.Repositories
             Customers = customers;
             Orders = orders;
             OrderDetails = orderDetails;
+            Categorys = categorys;
         }
 
         public void Dispose()

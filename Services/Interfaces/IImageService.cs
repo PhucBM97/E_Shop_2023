@@ -11,5 +11,11 @@ namespace Services.Interfaces
     {
         Task<IEnumerable<Image>> GetAllImages();
 
+        Task<IEnumerable<Image>> GetIamgesByProductId(int productId);
+
+        Task<bool> CreateImage(Image image);
+
+        bool DeleteImage(Image image);
+
     }
 }

@@ -19,6 +19,8 @@ namespace Core.Interfaces
 
         IOrderDetailRepository OrderDetails { get; }
 
+        ICategoryRepository Categorys { get; }
+
 
         int Save();
     }
