@@ -160,5 +160,17 @@ namespace Services
 
             return products;
         }
+
+        public async Task<bool> Delete(int productId)
+        {
+            var model = await _unitOfWork.Products.GetById(productId);
+            if(model is null) return false;
+
+            _unitOfWork.Products.Delete(model);
+            int result = _unitOfWork.Save();
+            if(result <= 0) return false;
+
+            return true;
+        }
     }
 }

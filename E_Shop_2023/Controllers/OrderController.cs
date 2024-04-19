@@ -33,6 +33,7 @@ namespace E_Shop_2023.Controllers
         [HttpPost("CreateOrder")]
         public async Task<IActionResult> CreateOrder([FromBody] OrderDTO entity)
         {
+            //phone + email
             var cus = await _customerSrv.GetCustomerByEmail(entity.CustomerEmail);
             if(cus is null)
             {
@@ -51,9 +52,9 @@ namespace E_Shop_2023.Controllers
 
             var order = new Order
             {
-                PaymentId = 1, // 1 = tt trực tiếp
+                PaymentId = ((int)Constants.Payment.Offline), // 1 = tt trực tiếp
                 CustomerId = checkCus.CustomerId, // lấy id của khách hàng ở trên ( theo email )
-                OrderStatusCode = 1, // 
+                OrderStatusCode = ((int)Constants.OrderStatus.Pending), // 
                 OrderDate = DateTime.Now,
                 Delivery = entity.OrderDelivery, // home hoặc store
                 Total = entity.OrderTotal, // tổng giá tiền 
@@ -78,6 +79,37 @@ namespace E_Shop_2023.Controllers
             {
                 Message = "Thành công !"
             });
+
+        }
+
+        [HttpGet("getorders")]
+        public async Task<IActionResult> GetOrders()
+        {
+            var orders = await _orderSrv.GetAllOrders();
+
+            var customers = await _customerSrv.GetAllCustomers();
+
+            foreach (var order in orders)
+            {
+                order.Customer = customers.FirstOrDefault(p => p.CustomerId == order.CustomerId);
+            }
+
+            var orderModel = new List<OrdersDTO>();
+
+            foreach (var order in orders)
+            {
+                orderModel.Add(new OrdersDTO
+                {
+                    OrderID = order.OrderId,
+                    CustomerName = order.Customer?.FullName,
+                    CustomerPhone = order.Customer?.Phone,
+                    CustomerAddress = order.Customer?.Address,
+                    OrderStatusCode = order.OrderStatusCode,
+                    OrderDate = order.OrderDate,
+                    OrderTotal = order.Total
+                });
+            }
+            return Ok(orderModel);
 
         }
 

@@ -17,12 +17,13 @@ namespace Services.Interfaces
 
         Task<Product> GetProductById(int productId);
 
-        public int UpdateProduct(Product product);
+        int UpdateProduct(Product product);
 
         Task<bool> DeleteProduct(int productId);
 
         Task<IEnumerable<Product>> GetProductByBrand(int brandId, int currentPage, int pageSize = 6);
 
+        Task<bool> Delete(int productId);
 
     }
 }

@@ -255,14 +255,14 @@ namespace E_Shop_2023.Controllers
         //    });
         //}
 
-        [HttpDelete("DeleteProduct/{id}")]
+        [HttpDelete("delete-product/{id}")]
         public async Task<IActionResult> DeleteProduct(int id)
         {
             var result = await _prodSrv.DeleteProduct(id);
             if(!result)
                 return BadRequest(new
                 {
-                    Message = "product deletion failed!"
+                    Message = "product not found!"
                 });
 
             return Ok(new
