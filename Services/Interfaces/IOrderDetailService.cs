@@ -10,7 +10,10 @@ namespace Services.Interfaces
     public interface IOrderDetailService
     {
         Task<IEnumerable<OrderDetail>> GetAllOrderDetails();
+        Task<IEnumerable<OrderDetail>> GetOrderDetailByOrderId(int orderId);
 
         Task<bool> AddOrderDetail(OrderDetail orderDetail);
+
+        
     }
 }

@@ -10,18 +10,22 @@ namespace E_Shop_2023.Controllers
     [ApiController]
     public class OrderController : ControllerBase
     {
-        public readonly ICustomerService _customerSrv;
-        public readonly IOrderService _orderSrv;
-        public readonly IOrderDetailService _orderDetailSrv;
+        private readonly ICustomerService _customerSrv;
+        private readonly IOrderService _orderSrv;
+        private readonly IOrderDetailService _orderDetailSrv;
+        private readonly IProductService _productSrv;
+
         
         public OrderController(
             ICustomerService customerService,
             IOrderService orderService,
-            IOrderDetailService orderDetailService)
+            IOrderDetailService orderDetailService,
+            IProductService productService)
         {
             _customerSrv = customerService;
             _orderSrv = orderService;
             _orderDetailSrv = orderDetailService;
+            _productSrv = productService;
         }
 
         [HttpGet]
@@ -111,6 +115,34 @@ namespace E_Shop_2023.Controllers
             }
             return Ok(orderModel);
 
+        }
+        [HttpGet("getorderdetail/{orderId}")]
+        public async Task<IActionResult> GetOrderDetail(int orderId)
+        {
+            var orderDetails = await _orderDetailSrv.GetOrderDetailByOrderId(orderId);
+
+            foreach (var item in orderDetails)
+            {
+                item.Product = await _productSrv.GetProductById(item.ProductId ?? 0);
+            }
+
+            var model = new List<OrderDetailsDTO>();
+
+            foreach (var info in orderDetails)
+            {
+                model.Add(new OrderDetailsDTO
+                {
+                    ProductId = info.Product.ProductId,
+                    ProductName = info.Product.ProductName,
+                    ProductImg = info.Product.ImageUrl,
+                    ProductPrice = info.Price ?? 0,
+                    ProductQuantity = info.Quantity ?? 0,
+                    SubTotal = info.SubTotal ?? 0,
+                });
+            }
+
+
+            return Ok(model);
         }
 
     }

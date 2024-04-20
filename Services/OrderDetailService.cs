@@ -30,10 +30,16 @@ namespace Services
             return false;
         }
 
-        public Task<IEnumerable<OrderDetail>> GetAllOrderDetails()
+        public async Task<IEnumerable<OrderDetail>> GetAllOrderDetails()
         {
-            var orderDetails = _unitOfWork.OrderDetails.GetAll();
+            var orderDetails = await _unitOfWork.OrderDetails.GetAll();
             return orderDetails;
+        }
+
+        public async Task<IEnumerable<OrderDetail>> GetOrderDetailByOrderId(int orderId)
+        {
+            var orderDetail = await _unitOfWork.OrderDetails.GetDataWithPredicate(p => p.OrderId == orderId);
+            return orderDetail;
         }
     }
 }
