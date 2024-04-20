@@ -89,7 +89,20 @@ namespace E_Shop_2023.Controllers
         [HttpGet("getorders")]
         public async Task<IActionResult> GetOrders()
         {
-            var orders = await _orderSrv.GetAllOrders();
+            //var orders = await _orderSrv.GetAllOrders();
+
+            var orderALL = await _orderSrv.GetAllOrders();
+
+            var orderPending = orderALL.Where(p => p.OrderStatusCode == 1);
+
+            var orderAfter = orderALL.Where(p => p.OrderStatusCode != 1);
+
+            var orders = new List<Order?>();
+
+            orders.AddRange(orderPending);
+            orders.AddRange(orderAfter);
+
+           
 
             var customers = await _customerSrv.GetAllCustomers();
 
@@ -143,6 +156,14 @@ namespace E_Shop_2023.Controllers
 
 
             return Ok(model);
+        }
+
+        [HttpPut("updatestatus")]
+        public async Task<IActionResult> UpdateStatus([FromBody] OrderStatusCodeDTO statusCode)
+        {
+            var result = await _orderSrv.UpdateStatusCode(statusCode);
+            if (!result) return BadRequest();
+            return Ok(result);
         }
 
     }

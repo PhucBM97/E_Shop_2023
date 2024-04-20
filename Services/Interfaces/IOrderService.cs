@@ -1,4 +1,5 @@
 ﻿using Core.Models;
+using Infrastructure.DTO;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,5 +13,7 @@ namespace Services.Interfaces
         Task<IEnumerable<Order>> GetAllOrders();
 
         Task<int> AddOrder(Order order);
+
+        Task<bool> UpdateStatusCode(OrderStatusCodeDTO statusCode);
     }
 }
