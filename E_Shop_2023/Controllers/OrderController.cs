@@ -166,5 +166,31 @@ namespace E_Shop_2023.Controllers
             return Ok(result);
         }
 
+        [HttpGet("getorderbymonth/{month}")]
+        public async Task<IActionResult> GetOrderByMonth(int month)
+        {
+           var orders = await _orderSrv.GetAllOrders();
+
+            //var orderByMonth = orders.Where(p => p.OrderDate.Value.Month == month && p.OrderDate.Value.Year == DateTime.Now.Year)
+            //                            .Select(o => new Chart { Name = o.OrderDate.ToString().Substring(0, 8), Value = o.Total});
+
+
+            var orderByMonth = orders.Where(p => p.OrderDate.Value.Month == month && p.OrderDate.Value.Year == DateTime.Now.Year)
+                                    .GroupBy(order => order.OrderDate.Value.Date) // orderdate = key
+                                    .OrderBy(o => o.Key)
+                                    .Select(group => new Chart
+                                    {
+                                        Name = group.Key.ToString().Substring(0, 8), // key là field group by
+                                        Value = group.Sum(order => order.Total)
+                                    });
+                                       
+
+            if (!orderByMonth.Any())
+            {
+                return NotFound();
+            }
+            return Ok(orderByMonth);
+        }
+
     }
 }

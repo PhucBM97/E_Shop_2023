@@ -1,5 +1,6 @@
 ﻿using Core.Models;
 using Infrastructure.DTO;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Services.Interfaces;
 
@@ -21,6 +22,7 @@ namespace E_Shop_2023.Controllers
             _httpContextAccessor = httpContextAccessor;
         }
 
+        [AllowAnonymous]
         [HttpGet("GetProductList/{currentPage}/{pageSize}")]
         public async Task<IActionResult> GetProductList(int currentPage, int pageSize)
         {
@@ -69,6 +71,7 @@ namespace E_Shop_2023.Controllers
             }
         }
 
+        [AllowAnonymous]
         [HttpGet("GetProductByBrand/{brandId}/{currentPage}/{pageSize}")]
         public async Task<IActionResult> GetProductByBrand(int brandId, int currentPage, int pageSize)
         {
@@ -272,6 +275,7 @@ namespace E_Shop_2023.Controllers
             // size specific, color specific, images, order detail, inventories
         }
 
+        [AllowAnonymous]
         [HttpGet("GetProductById/{productId}")]
         public async Task<IActionResult> GetProductById(int productId)
         {
